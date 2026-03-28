@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Asset Downloader</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.5; background: #f4f4f9; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        #log { margin-top: 20px; padding: 15px; border: 1px solid #ddd; background: #222; color: #eee; font-family: monospace; font-size: 12px; max-height: 400px; overflow-y: auto; border-radius: 4px; }
+        .success { color: #aaffaa; }
+        .error { color: #ffaaaa; }
+        .info { color: #88ccff; }
+        button { padding: 10px 20px; cursor: pointer; background: #0078d4; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        button:disabled { background: #ccc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Monaco Editor Downloader</h2>
+        <p>Target: <code>{targetPath}</code></p>
+        <button id="downloadBtn">Start Download</button>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        const package = "monaco-editor@0.56.0-dev-20260211";
+        const targetPath = "dev/vs/";
+        const api = `https://data.jsdelivr.com/v1/package/npm/${package}/flat`;
+        const cdnBase = `https://cdn.jsdelivr.net/npm/${package}`; 
+
+        const logElement = document.getElementById('log');
+        const btn = document.getElementById('downloadBtn');
+
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            logElement.appendChild(div);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        async function downloadFile(url, fileName) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const blob = await response.blob();
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                log(`✓ Saved: ${fileName}`, 'success');
+            } catch (err) {
+                log(`✗ Error downloading ${fileName}: ${err.message}`, 'error');
+            }
+        }
+
+        btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            logElement.innerHTML = '';
+            log("Connecting to jsDelivr API...");
+
+            try {
+                const res = await fetch(api);
+                const data = await res.json();
+                
+                // Clean the target path for comparison (remove leading/trailing slashes)
+                const cleanTarget = targetPath.replace(/^\/|\/$/g, '');
+
+                const files = data.files.filter(f => {
+                    const cleanName = f.name.replace(/^\//, ''); // Remove leading slash from API result
+                    return cleanName.startsWith(cleanTarget) && cleanName.endsWith('.css');
+                });
+
+                log(`Found ${files.length} matching files.`);
+
+                if (files.length === 0) {
+                    log("DEBUG: No matches found. Printing first 3 files in package:", "error");
+                    data.files.slice(0, 3).forEach(f => log(`-> ${f.name}`));
+                    return;
+                }
+
+                for (const file of files) {
+                    const fileName = file.name.split('/').pop();
+                    // Ensure fullUrl has exactly one slash between base and file.name
+                    const fullUrl = cdnBase + (file.name.startsWith('/') ? '' : '/') + file.name;
+                    await downloadFile(fullUrl, fileName);
+                    await new Promise(r => setTimeout(r, 250)); // Throttling
+                }
+
+                log("Download process finished.");
+            } catch (err) {
+                log(`Critical Error: ${err.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
