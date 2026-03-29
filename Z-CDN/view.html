@@ -1,129 +1,493 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Z-CDN Explorer</title>
-<style>
-body { font-family: 'Segoe UI', system-ui, sans-serif; padding: 20px; background: #f6f8fa; color: #24292f; }
-.container { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 8px; border: 1px solid #d0d7de; box-shadow: 0 3px 6px rgba(140,149,159,0.15); }
-.header { border-bottom: 1px solid #d8dee4; padding-bottom: 15px; margin-bottom: 20px; }
-.breadcrumb { font-family: monospace; background: #afb8c133; padding: 8px; border-radius: 6px; margin-bottom: 15px; }
-.breadcrumb span { color: #0969da; cursor: pointer; font-weight: bold; }
-#explorer-table { width: 100%; border-collapse: collapse; }
-#explorer-table th { text-align: left; padding: 10px; border-bottom: 2px solid #d0d7de; font-size: 14px; }
-#explorer-table td { padding: 10px; border-bottom: 1px solid #ebf0f4; font-size: 14px; }
-.file-row:hover { background: #f6f8fa; }
-.icon { margin-right: 8px; }
-.folder { color: #54aeff; font-weight: 600; cursor: pointer; }
-.file { color: #24292f; }
-.actions a { color: #0969da; text-decoration: none; font-size: 12px; margin-left: 10px; border: 1px solid #d0d7de; padding: 2px 8px; border-radius: 4px; background: #f6f8fa; }
-.actions a:hover { background: #0969da; color: white; border-color: #0969da; }
-#log { margin-top: 20px; padding: 10px; background: #24292f; color: #f0f6fc; font-family: monospace; font-size: 12px; border-radius: 6px; max-height: 100px; overflow-y: auto; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z-CDN Explorer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 24px 20px;
+            color: #1a1f2c;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+            border: 1px solid #e9edf2;
+            transition: all 0.2s;
+        }
+
+        .header {
+            padding: 24px 28px 16px 28px;
+            background: #ffffff;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .header h2 {
+            margin: 0 0 6px 0;
+            font-weight: 600;
+            font-size: 1.7rem;
+            background: linear-gradient(135deg, #1e2b3c, #2c3e50);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.2px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #eef2ff;
+            color: #0a5b8c;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 40px;
+            margin-top: 8px;
+            border: 1px solid #dce3ec;
+        }
+
+        .restriction-note {
+            background: #fef8e7;
+            border-left: 4px solid #f4a100;
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            margin: 16px 28px 0 28px;
+            border-radius: 12px;
+            color: #7a6400;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(2px);
+        }
+
+        .restriction-note span {
+            font-weight: 600;
+        }
+
+        .breadcrumb {
+            margin: 0 28px 16px 28px;
+            background: #f8fafd;
+            padding: 10px 16px;
+            border-radius: 14px;
+            font-family: 'SF Mono', 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            border: 1px solid #e6edf4;
+            box-shadow: inset 0 1px 1px #00000004, 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .breadcrumb span {
+            color: #2266b9;
+            cursor: pointer;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb span:hover {
+            color: #0f4c81;
+            text-decoration: underline;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 0 20px 16px 20px;
+        }
+
+        #explorer-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            border-radius: 16px;
+        }
+
+        #explorer-table th {
+            text-align: left;
+            padding: 14px 12px;
+            background: #f9fbfd;
+            border-bottom: 1.5px solid #e2e8f0;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        #explorer-table td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #edf2f7;
+            vertical-align: middle;
+        }
+
+        .file-row {
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+
+        .file-row:hover {
+            background: #f5f9ff;
+        }
+
+        .folder {
+            font-weight: 600;
+            color: #2c6e9e;
+            cursor: pointer;
+        }
+
+        .file {
+            color: #2c3e4e;
+        }
+
+        .icon {
+            margin-right: 10px;
+            font-size: 1.05rem;
+        }
+
+        .actions a {
+            color: #2c6e9e;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #f1f5f9;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-left: 8px;
+            transition: all 0.2s;
+            display: inline-block;
+            border: 1px solid #e0e7ef;
+        }
+
+        .actions a:first-child {
+            margin-left: 0;
+        }
+
+        .actions a:hover {
+            background: #1f6392;
+            color: white;
+            border-color: #1f6392;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        #log {
+            margin: 20px 28px 28px 28px;
+            background: #1e2a36;
+            color: #cbd5e6;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.75rem;
+            padding: 14px 18px;
+            border-radius: 16px;
+            max-height: 110px;
+            overflow-y: auto;
+            border: 1px solid #2d3e4e;
+            line-height: 1.4;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 48px 20px;
+            color: #6c7a8e;
+            font-style: italic;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 12px 20px;
+            border-top: 1px solid #ecf1f6;
+            color: #6c819a;
+            background: #fefefe;
+        }
+
+        @media (max-width: 680px) {
+            body { padding: 12px; }
+            .header { padding: 18px 20px; }
+            .breadcrumb { margin: 0 16px 12px 16px; }
+            .restriction-note { margin: 12px 16px 0 16px; }
+            .table-wrapper { margin: 0 12px 12px 12px; }
+            #log { margin: 16px 16px 20px 16px; }
+            .actions a { padding: 3px 8px; font-size: 0.7rem; }
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-<div class="header">
-<h2>GitHub Repository Explorer</h2>
-<p>Browsing files directly from the GitHub API</p>
+    <div class="header">
+        <h2>📦 Z-CDN Explorer</h2>
+        <div class="badge">🔒 Restricted to /Z-CDN/ directory only</div>
+    </div>
+    <div class="restriction-note">
+        ⚡ <span>Z-CDN isolation mode</span> — Navigation is locked inside <strong>Z-CDN/</strong> folder. Parent directory above Z-CDN is not accessible.
+    </div>
+    <div id="path-display" class="breadcrumb">⟳ loading context...</div>
+    <div class="table-wrapper">
+        <table id="explorer-table">
+            <thead>
+                <tr><th>Name</th><th>Size</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="explorer-body">
+                <tr><td colspan="3" style="text-align:center;">🔍 scanning Z-CDN repository...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="log"></div>
+    <footer>🔐 Z-CDN locked view • files served directly from GitHub raw</footer>
 </div>
-<div id="path-display" class="breadcrumb">root</div>
-<table id="explorer-table">
-<thead>
-<tr>
-<th>Name</th>
-<th>Size</th>
-<th>Actions</th>
-</tr>
-</thead>
-<tbody id="explorer-body">
-<tr><td colspan="3">Initializing scanner...</td></tr>
-</tbody>
-</table>
-<div id="log"></div>
-</div>
+
 <script>
-const CONFIG = {
-user: "Z-TEAM-OFFICIAL",
-repo: "z-team-official.github.io",
-branch: "main"
-};
-let currentPath = "";
-const body = document.getElementById('explorer-body');
-const pathDisplay = document.getElementById('path-display');
-const logEl = document.getElementById('log');
-function log(msg) {
-const d = document.createElement('div');
-d.textContent = `> ${msg}`;
-logEl.appendChild(d);
-logEl.scrollTop = logEl.scrollHeight;
-}
-function formatSize(bytes) {
-if (bytes === 0) return "-";
-const k = 1024;
-const sizes = ['Bytes', 'KB', 'MB'];
-const i = Math.floor(Math.log(bytes) / Math.log(k));
-return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-async function scanDirectory(path = "Z-CDN") {
-currentPath = path;
-body.innerHTML = '<tr><td colspan="3">Scanning Z-CDN...</td></tr>';
-updateBreadcrumbs();
-const apiUrl = `https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${path}?ref=${CONFIG.branch}`;
-try {
-const res = await fetch(apiUrl);
-if (!res.ok) throw new Error("API Limit reached or Private Repo");
-const items = await res.json();
-body.innerHTML = "";
-if (path !== "") {
-const backRow = body.insertRow();
-backRow.innerHTML = `<td colspan="3" class="folder"><b>.. (Parent Directory)</b></td>`;
-backRow.onclick = () => {
-const parts = path.split('/');
-parts.pop();
-scanDirectory(parts.join('/'));
-};
-}
-items.sort((a, b) => (b.type === 'dir') - (a.type === 'dir') || a.name.localeCompare(b.name));
-items.forEach(item => {
-const row = body.insertRow();
-row.className = 'file-row';
-const isDir = item.type === 'dir';
-const icon = isDir ? '📁' : '📄';
-const rawUrl = `https://raw.githubusercontent.com/${CONFIG.user}/${CONFIG.repo}/${CONFIG.branch}/${item.path}`;
-row.innerHTML = `
-<td class="${isDir ? 'folder' : 'file'}">
-<span class="icon">${icon}</span>${item.name}${isDir ? '/' : ''}
-</td>
-<td>${isDir ? '-' : formatSize(item.size)}</td>
-<td class="actions">
-${isDir ? '' : `<a href="${rawUrl}" target="_blank">View Raw</a>`}
-${isDir ? '' : `<a href="${rawUrl}" download="${item.name}">Download</a>`}
-</td>
-`;
-if (isDir) {
-row.onclick = () => scanDirectory(item.path);
-}
-});
-log(`Loaded ${items.length} items from /${path}`);
-} catch (err) {
-log("Error: " + err.message);
-body.innerHTML = `<tr><td colspan="3" style="color:red">Failed to load content. Ensure CONFIG is correct and repo is public.</td></tr>`;
-}
-}
-function updateBreadcrumbs() {
-const parts = currentPath.split('/').filter(p => p);
-let html = `<span onclick="scanDirectory('')">root</span>`;
-let totalPath = "";
-parts.forEach(p => {
-totalPath += (totalPath === "" ? "" : "/") + p;
-const currentStep = totalPath;
-html += ` / <span onclick="scanDirectory('${currentStep}')">${p}</span>`;
-});
-pathDisplay.innerHTML = html;
-}
-// Start the scan
-scanDirectory("");
+    // ======================== CONFIGURATION ========================
+    const CONFIG = {
+        user: "Z-TEAM-OFFICIAL",
+        repo: "z-team-official.github.io",
+        branch: "main"
+    };
+    const RESTRICTED_BASE = "Z-CDN";     // root folder — ONLY show contents inside this directory
+    
+    // state: full path from repo root (always starts with "Z-CDN")
+    let currentFullPath = RESTRICTED_BASE;   
+    
+    const bodyEl = document.getElementById('explorer-body');
+    const pathDisplay = document.getElementById('path-display');
+    const logEl = document.getElementById('log');
+    
+    // helper: logging with timestamp-like style
+    function log(msg, isError = false) {
+        const d = document.createElement('div');
+        d.textContent = `> ${new Date().toLocaleTimeString()} · ${msg}`;
+        if (isError) d.style.color = "#ffb4a2";
+        else d.style.color = "#b9e6ff";
+        logEl.appendChild(d);
+        logEl.scrollTop = logEl.scrollHeight;
+        // keep log tidy
+        while (logEl.children.length > 45) logEl.removeChild(logEl.firstChild);
+    }
+    
+    function formatSize(bytes) {
+        if (!bytes || bytes === 0) return "—";
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+    
+    // ensure path stays inside Z-CDN (enforce security)
+    function sanitizePath(requestedPath) {
+        if (!requestedPath || typeof requestedPath !== 'string') return RESTRICTED_BASE;
+        // trim and normalize slashes
+        let normalized = requestedPath.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+        if (normalized === '') return RESTRICTED_BASE;
+        // if path does NOT start with RESTRICTED_BASE exactly, we force to base
+        if (!normalized.startsWith(RESTRICTED_BASE)) {
+            log(`⛔ Access denied: "${requestedPath}" is outside Z-CDN/. Redirecting to Z-CDN/`, true);
+            return RESTRICTED_BASE;
+        }
+        // prevent traversal tricks like Z-CDN/../evil (still starts with Z-CDN but let's block any '..')
+        if (normalized.includes('/../') || normalized.includes('/..') || normalized === '..' || normalized.startsWith('../')) {
+            log(`⛔ Invalid navigation: path traversal detected. Staying in Z-CDN/`, true);
+            return RESTRICTED_BASE;
+        }
+        return normalized;
+    }
+    
+    // get parent folder full path (safe: never goes above Z-CDN)
+    function getParentPath(fullPath) {
+        if (fullPath === RESTRICTED_BASE) return null; // no parent beyond base
+        const parts = fullPath.split('/');
+        if (parts.length <= 1) return null;
+        parts.pop();  // remove last segment
+        const parent = parts.join('/');
+        // ensure parent still starts with RESTRICTED_BASE (should be always true)
+        if (parent.length < RESTRICTED_BASE.length) return RESTRICTED_BASE;
+        return parent;
+    }
+    
+    // update interactive breadcrumb (relative to Z-CDN root)
+    function updateBreadcrumb() {
+        if (!currentFullPath || !currentFullPath.startsWith(RESTRICTED_BASE)) {
+            pathDisplay.innerHTML = `<span onclick="navigateTo('${RESTRICTED_BASE}')">📁 Z-CDN</span>`;
+            return;
+        }
+        // build clickable segments: show relative path from base
+        const relativePath = currentFullPath.slice(RESTRICTED_BASE.length).replace(/^\/+/, '');
+        const segments = relativePath ? relativePath.split('/') : [];
+        let html = `<span onclick="navigateTo('${RESTRICTED_BASE}')">📁 Z-CDN</span>`;
+        let cumulative = RESTRICTED_BASE;
+        for (let i = 0; i < segments.length; i++) {
+            const seg = segments[i];
+            if (!seg) continue;
+            cumulative += '/' + seg;
+            html += ` / <span onclick="navigateTo('${cumulative}')">${escapeHtml(seg)}</span>`;
+        }
+        pathDisplay.innerHTML = html;
+    }
+    
+    // simple XSS guard
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+    
+    // core fetch & render directory content
+    async function scanDirectory(fullPath) {
+        // enforce path restriction
+        const safePath = sanitizePath(fullPath);
+        if (safePath !== fullPath) {
+            currentFullPath = safePath;
+        } else {
+            currentFullPath = safePath;
+        }
+        
+        updateBreadcrumb();
+        
+        // show loading state
+        bodyEl.innerHTML = `<tr><td colspan="3" style="padding: 32px; text-align:center;">⏳ Loading ${escapeHtml(currentFullPath)} ...</td></tr>`;
+        
+        const apiUrl = `https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${currentFullPath}?ref=${CONFIG.branch}`;
+        
+        try {
+            log(`📂 Fetching: ${currentFullPath}`);
+            const res = await fetch(apiUrl);
+            
+            if (!res.ok) {
+                if (res.status === 404) {
+                    throw new Error(`Folder "${currentFullPath}" not found in repository. Make sure Z-CDN/ exists.`);
+                } else if (res.status === 403) {
+                    throw new Error("GitHub API rate limit exceeded. Try again later.");
+                } else {
+                    throw new Error(`API error ${res.status}: ${res.statusText}`);
+                }
+            }
+            
+            const items = await res.json();
+            if (!Array.isArray(items)) {
+                throw new Error("Invalid API response (not a directory)");
+            }
+            
+            // render table
+            bodyEl.innerHTML = '';
+            
+            // show ".." parent if we are NOT at the restricted base (Z-CDN)
+            if (currentFullPath !== RESTRICTED_BASE) {
+                const parentPath = getParentPath(currentFullPath);
+                if (parentPath && parentPath !== currentFullPath) {
+                    const backRow = bodyEl.insertRow();
+                    backRow.className = 'file-row';
+                    backRow.style.cursor = 'pointer';
+                    const parentCell = backRow.insertCell(0);
+                    parentCell.colSpan = 3;
+                    parentCell.innerHTML = `<span class="icon">📁</span> <strong style="color:#2c6e9e;">.. (Parent Directory)</strong>`;
+                    parentCell.style.fontWeight = '500';
+                    backRow.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (parentPath && parentPath !== currentFullPath) {
+                            scanDirectory(parentPath);
+                        } else {
+                            scanDirectory(RESTRICTED_BASE);
+                        }
+                    });
+                }
+            }
+            
+            // sort: folders first, then files alphabetically
+            const sortedItems = [...items].sort((a, b) => {
+                if (a.type === 'dir' && b.type !== 'dir') return -1;
+                if (a.type !== 'dir' && b.type === 'dir') return 1;
+                return a.name.localeCompare(b.name);
+            });
+            
+            let folderCount = 0, fileCount = 0;
+            for (const item of sortedItems) {
+                const isDirectory = (item.type === 'dir');
+                if (isDirectory) folderCount++;
+                else fileCount++;
+                
+                const icon = isDirectory ? '📂' : '📄';
+                const displayName = isDirectory ? `${item.name}/` : item.name;
+                const fileSize = isDirectory ? '—' : formatSize(item.size);
+                const rawFileUrl = `https://raw.githubusercontent.com/${CONFIG.user}/${CONFIG.repo}/${CONFIG.branch}/${item.path}`;
+                
+                const row = bodyEl.insertRow();
+                row.className = 'file-row';
+                
+                // name column
+                const nameCell = row.insertCell(0);
+                nameCell.className = isDirectory ? 'folder' : 'file';
+                nameCell.innerHTML = `<span class="icon">${icon}</span>${escapeHtml(displayName)}`;
+                
+                // size column
+                const sizeCell = row.insertCell(1);
+                sizeCell.textContent = fileSize;
+                sizeCell.style.whiteSpace = 'nowrap';
+                
+                // actions column (only for files)
+                const actionsCell = row.insertCell(2);
+                actionsCell.className = 'actions';
+                if (!isDirectory) {
+                    actionsCell.innerHTML = `
+                        <a href="${rawFileUrl}" target="_blank" rel="noopener noreferrer">📄 Raw</a>
+                        <a href="${rawFileUrl}" download="${escapeHtml(item.name)}">⬇️ Download</a>
+                    `;
+                } else {
+                    actionsCell.innerHTML = '<span style="color:#9aaebf; font-size:0.7rem;">—</span>';
+                }
+                
+                // click on row -> open folder (if directory)
+                if (isDirectory) {
+                    row.style.cursor = 'pointer';
+                    row.addEventListener('click', (e) => {
+                        // prevent if clicking on action links inside folder row (but there's no action link for folder)
+                        if (e.target.tagName === 'A') return;
+                        scanDirectory(item.path);   // item.path is full API path (includes Z-CDN prefix)
+                    });
+                }
+            }
+            
+            log(`✅ Loaded ${folderCount} folder(s), ${fileCount} file(s) from ${currentFullPath}`);
+            if (sortedItems.length === 0) {
+                const emptyRow = bodyEl.insertRow();
+                emptyRow.innerHTML = `<td colspan="3" class="empty-message">📭 This directory is empty (no files or subfolders)</td>`;
+            }
+        } catch (err) {
+            log(`❌ ERROR: ${err.message}`, true);
+            console.error(err);
+            bodyEl.innerHTML = `<tr><td colspan="3" style="padding: 40px; text-align:center; color:#c2410c;">⚠️ Failed to load: ${escapeHtml(err.message)}<br><span style="font-size:0.8rem;">Make sure repository is public and Z-CDN/ exists.</span></td></tr>`;
+        }
+    }
+    
+    // public wrapper for breadcrumb & external navigation (ensures restriction)
+    window.navigateTo = function(targetPath) {
+        const safeTarget = sanitizePath(targetPath);
+        if (safeTarget !== targetPath) {
+            log(`🔁 Redirected to allowed directory: ${safeTarget}`);
+        }
+        scanDirectory(safeTarget);
+    };
+    
+    // initial load: ONLY SHOW Z-CDN/ directory
+    async function initExplorer() {
+        log(`🚀 Z-CDN Explorer initialized — locked to /${RESTRICTED_BASE}/`);
+        log(`🔍 Target repository: ${CONFIG.user}/${CONFIG.repo} (branch: ${CONFIG.branch})`);
+        // start inside Z-CDN
+        await scanDirectory(RESTRICTED_BASE);
+    }
+    
+    // run application
+    initExplorer().catch(e => {
+        log(`🔥 Critical init error: ${e.message}`, true);
+        bodyEl.innerHTML = `<tr><td colspan="3" style="padding: 30px;color:red;">Failed to initialize explorer. Check console.</td></tr>`;
+    });
 </script>
 </body>
 </html>
