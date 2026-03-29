@@ -48,7 +48,7 @@ user: "Z-TEAM-OFFICIAL",
 repo: "z-team-official.github.io",
 branch: "main"
 };
-let currentPath = "Z-CDN";
+let currentPath = "";
 const body = document.getElementById('explorer-body');
 const pathDisplay = document.getElementById('path-display');
 const logEl = document.getElementById('log');
@@ -65,9 +65,9 @@ const sizes = ['Bytes', 'KB', 'MB'];
 const i = Math.floor(Math.log(bytes) / Math.log(k));
 return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
-async function scanDirectory(path = "") {
+async function scanDirectory(path = "Z-CDN") {
 currentPath = path;
-body.innerHTML = '<tr><td colspan="3">Scanning GitHub API...</td></tr>';
+body.innerHTML = '<tr><td colspan="3">Scanning Z-CDN...</td></tr>';
 updateBreadcrumbs();
 const apiUrl = `https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${path}?ref=${CONFIG.branch}`;
 try {
