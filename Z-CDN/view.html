@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GitHub CDN Asset Viewer</title>
+<style>
+body { font-family: 'Segoe UI', system-ui, sans-serif; padding: 20px; background: #f6f8fa; color: #24292f; }
+.container { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 8px; border: 1px solid #d0d7de; box-shadow: 0 3px 6px rgba(140,149,159,0.15); }
+.header { border-bottom: 1px solid #d8dee4; padding-bottom: 15px; margin-bottom: 20px; }
+.breadcrumb { font-family: monospace; background: #afb8c133; padding: 8px; border-radius: 6px; margin-bottom: 15px; }
+.breadcrumb span { color: #0969da; cursor: pointer; font-weight: bold; }
+#explorer-table { width: 100%; border-collapse: collapse; }
+#explorer-table th { text-align: left; padding: 10px; border-bottom: 2px solid #d0d7de; font-size: 14px; }
+#explorer-table td { padding: 10px; border-bottom: 1px solid #ebf0f4; font-size: 14px; }
+.file-row:hover { background: #f6f8fa; }
+.icon { margin-right: 8px; }
+.folder { color: #54aeff; font-weight: 600; cursor: pointer; }
+.file { color: #24292f; }
+.actions a { color: #0969da; text-decoration: none; font-size: 12px; margin-left: 10px; border: 1px solid #d0d7de; padding: 2px 8px; border-radius: 4px; background: #f6f8fa; }
+.actions a:hover { background: #0969da; color: white; border-color: #0969da; }
+#log { margin-top: 20px; padding: 10px; background: #24292f; color: #f0f6fc; font-family: monospace; font-size: 12px; border-radius: 6px; max-height: 100px; overflow-y: auto; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h2>GitHub Repository Explorer</h2>
+<p>Browsing files directly from the GitHub API</p>
+</div>
+<div id="path-display" class="breadcrumb">root</div>
+<table id="explorer-table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Size</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="explorer-body">
+<tr><td colspan="3">Initializing scanner...</td></tr>
+</tbody>
+</table>
+<div id="log"></div>
+</div>
+<script>
+const CONFIG = {
+user: "Z-TEAM-OFFICIAL",
+repo: "z-team-official.github.io/Z-CDN",
+branch: "main"
+};
+let currentPath = "";
+const body = document.getElementById('explorer-body');
+const pathDisplay = document.getElementById('path-display');
+const logEl = document.getElementById('log');
+function log(msg) {
+const d = document.createElement('div');
+d.textContent = `> ${msg}`;
+logEl.appendChild(d);
+logEl.scrollTop = logEl.scrollHeight;
+}
+function formatSize(bytes) {
+if (bytes === 0) return "-";
+const k = 1024;
+const sizes = ['Bytes', 'KB', 'MB'];
+const i = Math.floor(Math.log(bytes) / Math.log(k));
+return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+async function scanDirectory(path = "") {
+currentPath = path;
+body.innerHTML = '<tr><td colspan="3">Scanning GitHub API...</td></tr>';
+updateBreadcrumbs();
+const apiUrl = `https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${path}?ref=${CONFIG.branch}`;
+try {
+const res = await fetch(apiUrl);
+if (!res.ok) throw new Error("API Limit reached or Private Repo");
+const items = await res.json();
+body.innerHTML = "";
+if (path !== "") {
+const backRow = body.insertRow();
+backRow.innerHTML = `<td colspan="3" class="folder"><b>.. (Parent Directory)</b></td>`;
+backRow.onclick = () => {
+const parts = path.split('/');
+parts.pop();
+scanDirectory(parts.join('/'));
+};
+}
+items.sort((a, b) => (b.type === 'dir') - (a.type === 'dir') || a.name.localeCompare(b.name));
+items.forEach(item => {
+const row = body.insertRow();
+row.className = 'file-row';
+const isDir = item.type === 'dir';
+const icon = isDir ? '📁' : '📄';
+const rawUrl = `https://raw.githubusercontent.com/${CONFIG.user}/${CONFIG.repo}/${CONFIG.branch}/${item.path}`;
+row.innerHTML = `
+<td class="${isDir ? 'folder' : 'file'}">
+<span class="icon">${icon}</span>${item.name}${isDir ? '/' : ''}
+</td>
+<td>${isDir ? '-' : formatSize(item.size)}</td>
+<td class="actions">
+${isDir ? '' : `<a href="${rawUrl}" target="_blank">View Raw</a>`}
+${isDir ? '' : `<a href="${rawUrl}" download="${item.name}">Download</a>`}
+</td>
+`;
+if (isDir) {
+row.onclick = () => scanDirectory(item.path);
+}
+});
+log(`Loaded ${items.length} items from /${path}`);
+} catch (err) {
+log("Error: " + err.message);
+body.innerHTML = `<tr><td colspan="3" style="color:red">Failed to load content. Ensure CONFIG is correct and repo is public.</td></tr>`;
+}
+}
+function updateBreadcrumbs() {
+const parts = currentPath.split('/').filter(p => p);
+let html = `<span onclick="scanDirectory('')">root</span>`;
+let totalPath = "";
+parts.forEach(p => {
+totalPath += (totalPath === "" ? "" : "/") + p;
+const currentStep = totalPath;
+html += ` / <span onclick="scanDirectory('${currentStep}')">${p}</span>`;
+});
+pathDisplay.innerHTML = html;
+}
+// Start the scan
+scanDirectory("");
+</script>
+</body>
+</html>
