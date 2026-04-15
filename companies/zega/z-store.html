@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Z-STORE | Digital Distribution</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { background-color: #050505; color: #ffffff; font-family: 'Inter', sans-serif; }
+.glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
+.glass:hover { border-color: rgba(59, 130, 246, 0.5); background: rgba(255, 255, 255, 0.05); }
+.gradient-text { background: linear-gradient(90deg, #00C6FF, #0072FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+</style>
+</head>
+<body class="flex flex-col items-center min-h-screen">
+<nav class="w-full p-8 flex justify-between items-center max-w-6xl">
+<div class="text-2xl font-black tracking-tighter italic">Z-STORE</div>
+<div class="hidden md:flex space-x-8 text-xs font-mono uppercase tracking-widest text-gray-500">
+<a href="#" class="hover:text-blue-400 transition">Operating Systems</a>
+<a href="#" class="hover:text-blue-400 transition">Software</a>
+<a href="#" class="hover:text-blue-400 transition">Assets</a>
+</div>
+</nav>
+<header class="text-center py-16 px-4">
+<h1 class="text-5xl md:text-7xl font-extrabold mb-4 tracking-tighter">Premium <span class="gradient-text">Software</span></h1>
+<p class="text-gray-500 font-mono text-sm">Official Distribution Hub for Z-Series Projects</p>
+</header>
+<main class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl w-full px-6 pb-20">
+<div class="glass p-10 rounded-3xl flex flex-col justify-between">
+<div>
+<div class="text-blue-500 font-mono text-xs mb-2">Build: v0.0.1-Build9</div>
+<h2 class="text-3xl font-bold mb-4">ZOS-1</h2>
+<p class="text-gray-400 text-sm mb-8 leading-relaxed">The flagship operating system. Optimized for low-latency tasks and high-security environments.</p>
+</div>
+<div>
+<div class="text-2xl font-mono mb-6">$0.99</div>
+<button onclick="handlePurchase('ZOS1')" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-500 transition shadow-lg shadow-blue-900/20">Get ZOS-1</button>
+</div>
+</div>
+<div class="glass p-10 rounded-3xl flex flex-col justify-between">
+<div>
+<div class="text-purple-500 font-mono text-xs mb-2">Version: 0.9.0-Alpha</div>
+<h2 class="text-3xl font-bold mb-4">ZCRAFT</h2>
+<p class="text-gray-400 text-sm mb-8 leading-relaxed">The ultimate sandbox utility. Build, deploy, and manage distributed nodes with a single command.</p>
+</div>
+<div>
+<div class="text-2xl font-mono mb-6">$0.99</div>
+<button onclick="handlePurchase('ZCRAFT')" class="w-full border border-white/20 text-white py-4 rounded-xl font-bold hover:bg-white hover:text-black transition">Get ZCRAFT</button>
+</div>
+</div>
+</main>
+<footer class="mt-auto p-10 text-gray-700 text-[10px] font-mono tracking-widest uppercase">
+Z-STORE Terminal Access // 2026 Deployment
+</footer>
+<script>
+const CONFIG = {
+REV_ID: "1234-1234-1234-1234",
+PRODUCTS: {
+ZOS1: {
+price: "0.99",
+filename: "zos-1-v0.0.1-build9.zip"
+},
+ZCRAFT: {
+price: "0.99",
+filename: "zcraft-0.9.0-alpha.zip"
+}
+}
+};
+function handlePurchase(prodKey) {
+const product = CONFIG.PRODUCTS[prodKey];
+const paymentUrl = `https://revolut.me/pay/${CONFIG.REV_ID}/${product.price}`;
+console.log(`Initiating download for: ${product.filename}`);
+window.location.href = paymentUrl;
+}
+</script>
+</body>
+</html>
