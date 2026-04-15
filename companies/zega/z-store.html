@@ -3,101 +3,118 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Z-STORE | Digital Distribution</title>
+<title>Z-STORE | Multi-Pay Terminal</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-body { background-color: #050505; color: #ffffff; font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
-.glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
-.glass:hover { border-color: rgba(59, 130, 246, 0.5); transform: translateY(-4px); }
-.filter-btn.active { background-color: #3b82f6; color: white; border-color: #3b82f6; }
-.gradient-text { background: linear-gradient(90deg, #00C6FF, #0072FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+body { background-color: #050505; color: #ffffff; font-family: 'Inter', sans-serif; }
+.glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 50; }
+.payment-card { transition: all 0.2s ease; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
+.payment-card:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
 </style>
 </head>
 <body class="flex flex-col items-center min-h-screen">
+
+<div id="paymentModal" class="modal flex items-center justify-center p-4">
+<div class="glass max-w-md w-full p-8 rounded-3xl relative">
+<button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white">✕</button>
+<h3 class="text-xl font-bold mb-2">Checkout: <span id="modalProdName"></span></h3>
+<p class="text-gray-400 text-sm mb-6 font-mono">Select a transfer method to Revolut</p>
+
+<div class="space-y-3">
+<div onclick="process('visa')" class="payment-card p-4 rounded-xl flex justify-between items-center">
+<span>Visa / Mastercard</span>
+<span class="text-[10px] font-mono text-gray-500">via Revolut</span>
+</div>
+<div onclick="process('revolut')" class="payment-card p-4 rounded-xl flex justify-between items-center">
+<span>Revolut Pay</span>
+<span class="text-[10px] font-mono text-blue-400">DIRECT</span>
+</div>
+<div onclick="process('paypal')" class="payment-card p-4 rounded-xl flex justify-between items-center">
+<span>PayPal</span>
+<span class="text-[10px] font-mono text-gray-500">Auto-Transfer</span>
+</div>
+<div onclick="process('cashapp')" class="payment-card p-4 rounded-xl flex justify-between items-center">
+<span>CashApp</span>
+<span class="text-[10px] font-mono text-green-400">$ZSTORE</span>
+</div>
+<div onclick="process('crypto')" class="payment-card p-4 rounded-xl flex justify-between items-center">
+<span>Cryptocurrency</span>
+<span class="text-[10px] font-mono text-orange-400">BTC/ETH/SOL</span>
+</div>
+</div>
+</div>
+</div>
+
 <nav class="w-full p-8 flex justify-between items-center max-w-6xl">
-<div class="text-2xl font-black tracking-tighter italic">Z-STORE</div>
-<div class="flex space-x-4">
-<button onclick="filterProducts('all')" class="filter-btn active px-4 py-1 rounded-full border border-white/10 text-xs font-mono uppercase">All</button>
-<button onclick="filterProducts('os')" class="filter-btn px-4 py-1 rounded-full border border-white/10 text-xs font-mono uppercase">OS</button>
-<button onclick="filterProducts('app')" class="filter-btn px-4 py-1 rounded-full border border-white/10 text-xs font-mono uppercase">Apps</button>
-</div>
+<div class="text-2xl font-black italic">Z-STORE</div>
 </nav>
-<header class="text-center py-12 px-4">
-<h1 class="text-5xl md:text-7xl font-extrabold mb-4 tracking-tighter">Z-STORE <span class="gradient-text">v2.0</span></h1>
-<p class="text-gray-500 font-mono text-sm">Deployment: 2026.04.15 // Global Distribution</p>
-</header>
-<main id="product-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl w-full px-6 pb-20">
-<div class="product-card glass p-8 rounded-3xl flex flex-col" data-category="os">
-<div class="flex justify-between items-start mb-6">
+
+<main class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl w-full px-6">
+<div class="glass p-10 rounded-3xl flex flex-col justify-between">
 <div>
-<div class="text-blue-500 font-mono text-xs mb-1">OS / Build 9</div>
-<h2 class="text-4xl font-bold italic">ZOS-1</h2>
+<div class="text-blue-500 font-mono text-xs mb-2">Build: v0.0.1-Build9</div>
+<h2 class="text-3xl font-bold mb-4 italic">ZOS-1 (GUI ENABLED)</h2>
+<p class="text-gray-400 text-sm mb-6">A full OS environment featuring working apps, window management and more!</p>
 </div>
-<div class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded text-[10px] font-bold">STABLE</div>
+<button onclick="openModal('ZOS1')" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-500 transition">Buy for $0.99</button>
 </div>
-<div class="space-y-4 mb-8">
-<p class="text-gray-400 text-sm leading-relaxed">Complete Operating System with integrated **Z-GUI Shell**. Experience a fluid, window-based environment.</p>
-<ul class="text-[11px] font-mono text-gray-500 space-y-2">
-<li>> Built-in Terminal & File Explorer</li>
-<li>> Z-Mail Client & Web Lite Browser</li>
-<li>> Hardware-accelerated UI Rendering</li>
-<li>> Package Manager Integration</li>
-</ul>
-</div>
-<div class="mt-auto">
-<div class="text-2xl font-mono mb-4 text-white">$0.99</div>
-<button onclick="handlePurchase('ZOS1')" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-500 transition shadow-lg shadow-blue-900/40">Initialize Download</button>
-</div>
-</div>
-<div class="product-card glass p-8 rounded-3xl flex flex-col" data-category="app">
-<div class="flex justify-between items-start mb-6">
+
+<div class="glass p-10 rounded-3xl flex flex-col justify-between">
 <div>
-<div class="text-purple-500 font-mono text-xs mb-1">Utility / Alpha</div>
-<h2 class="text-4xl font-bold italic">ZCRAFT</h2>
+<div class="text-purple-500 font-mono text-xs mb-2">Version: 0.9.0-Alpha</div>
+<h2 class="text-3xl font-bold mb-4 italic">ZCRAFT</h2>
+<p class="text-gray-400 text-sm mb-6">Advanced sandbox utility for resource management and development.</p>
 </div>
-<div class="bg-purple-500/10 text-purple-400 px-3 py-1 rounded text-[10px] font-bold">PREVIEW</div>
-</div>
-<div class="space-y-4 mb-8">
-<p class="text-gray-400 text-sm leading-relaxed">Automated node management and creative building suite. Essential for Z-Series developers.</p>
-<ul class="text-[11px] font-mono text-gray-500 space-y-2">
-<li>> Real-time Resource Monitoring</li>
-<li>> Collaborative Sandbox Mode</li>
-<li>> Low-Level System Hooking</li>
-</ul>
-</div>
-<div class="mt-auto">
-<div class="text-2xl font-mono mb-4 text-white">$0.99</div>
-<button onclick="handlePurchase('ZCRAFT')" class="w-full border border-white/20 text-white py-4 rounded-xl font-bold hover:bg-white hover:text-black transition">Add to System</button>
-</div>
+<button onclick="openModal('ZCRAFT')" class="w-full border border-white/20 text-white py-4 rounded-xl font-bold hover:bg-white hover:text-black transition">Buy for $0.39</button>
 </div>
 </main>
+
 <script>
 const CONFIG = {
 REV_ID: "5424-0246-0714-1360",
+CASHAPP_ID: "PLACEHOLDER",
+PAYPAL_EMAIL: "PLACEHOLDER",
+CRYPTO_WALLETS: { BTC: "PLACEHOLDER" },
 PRODUCTS: {
-ZOS1: { price: "0.99", filename: "zos-1-v0.0.1-build9.zip" },
-ZCRAFT: { price: "0.39", filename: "zcraft-0.9.0-alpha.zip" }
+ZOS1: { name: "ZOS-1", price: "0.99" },
+ZCRAFT: { name: "ZCRAFT", price: "0.39" }
 }
 };
-function filterProducts(category) {
-const cards = document.querySelectorAll('.product-card');
-const btns = document.querySelectorAll('.filter-btn');
-btns.forEach(btn => {
-btn.classList.remove('active');
-if(btn.innerText.toLowerCase() === category) btn.classList.add('active');
-});
-cards.forEach(card => {
-if (category === 'all' || card.getAttribute('data-category') === category) {
-card.style.display = 'flex';
-} else {
-card.style.display = 'none';
+
+let activeProduct = null;
+
+function openModal(prodKey) {
+activeProduct = CONFIG.PRODUCTS[prodKey];
+document.getElementById('modalProdName').innerText = activeProduct.name;
+document.getElementById('paymentModal').style.display = 'flex';
 }
-});
+
+function closeModal() {
+document.getElementById('paymentModal').style.display = 'none';
 }
-function handlePurchase(prodKey) {
-const product = CONFIG.PRODUCTS[prodKey];
-const paymentUrl = `https://revolut.me/pay/${CONFIG.REV_ID}/${product.price}`;
-window.location.href = paymentUrl;
+
+function process(method) {
+const price = activeProduct.price;
+let url = "";
+
+switch(method) {
+case 'visa':
+case 'revolut':
+// Revolut Me handles Card payments and Revolut transfers directly
+url = `https://revolut.me/pay/${CONFIG.REV_ID}/${price}`;
+break;
+case 'paypal':
+url = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${CONFIG.PAYPAL_EMAIL}&amount=${price}&item_name=${activeProduct.name}`;
+break;
+case 'cashapp':
+url = `https://cash.app/$${CONFIG.CASHAPP_ID}/${price}`;
+break;
+case 'crypto':
+alert(`Send exactly ${price} USD equivalent to: ${CONFIG.CRYPTO_WALLETS.BTC}`);
+return;
+}
+if(url) window.location.href = url;
 }
 </script>
 </body>
