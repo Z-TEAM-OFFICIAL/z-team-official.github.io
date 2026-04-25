@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>5424-0246-0714-136
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>🔴 DO NOT CLICK — $10,000 CHARGE | NO REFUNDS</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #03060e;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      padding: 2rem 1.5rem;
+      color: #eef2ff;
+    }
+
+    .app-layout {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+    }
+
+    /* TERMS PANEL — extensive clauses */
+    .terms-card {
+      flex: 1.2;
+      min-width: 320px;
+      background: #0b1120;
+      border-radius: 2rem;
+      border: 1px solid #2d3a5e;
+      overflow: hidden;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.6);
+    }
+
+    .terms-header {
+      background: #0f172a;
+      padding: 1.3rem 1.8rem;
+      border-bottom: 3px solid #dc2626;
+    }
+
+    .terms-header h2 {
+      font-size: 1.7rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffb347, #ff6b6b);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .terms-scroll {
+      max-height: 550px;
+      overflow-y: auto;
+      padding: 1.6rem 2rem;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: #cbd5e1;
+      scrollbar-width: thin;
+    }
+
+    .terms-scroll p {
+      margin-bottom: 1rem;
+    }
+
+    .terms-scroll h3 {
+      color: #facc15;
+      margin: 1.2rem 0 0.5rem 0;
+      font-size: 1.05rem;
+    }
+
+    .danger-clause {
+      background: #2d1a1a;
+      border-left: 6px solid #ff3b3b;
+      padding: 1rem 1.2rem;
+      border-radius: 1rem;
+      margin: 1.2rem 0;
+      font-weight: 600;
+      color: #ffc2c2;
+      box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+    }
+
+    .danger-clause strong {
+      color: #ff8888;
+    }
+
+    /* ACTION PANEL — card entry + DO NOT CLICK button */
+    .action-card {
+      flex: 1;
+      min-width: 360px;
+      background: #0f172ad9;
+      backdrop-filter: blur(8px);
+      border-radius: 2rem;
+      border: 1px solid #334155;
+      padding: 2rem 1.8rem;
+      box-shadow: 0 25px 40px -12px black;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #dc2626;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-left: 0.6rem;
+      vertical-align: middle;
+    }
+
+    .panel-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      margin-bottom: 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .sub {
+      color: #94a3b8;
+      margin-bottom: 1.8rem;
+      font-size: 0.85rem;
+      border-left: 3px solid #f97316;
+      padding-left: 0.8rem;
+    }
+
+    .card-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .input-group label {
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #9ca3af;
+    }
+
+    .input-group input {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 0.85rem 1rem;
+      border-radius: 1.2rem;
+      font-size: 0.95rem;
+      color: #f1f5f9;
+      transition: 0.2s;
+      outline: none;
+      font-family: monospace;
+    }
+
+    .input-group input:focus {
+      border-color: #f97316;
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.4);
+    }
+
+    .row-fields {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .row-fields .input-group {
+      flex: 1;
+    }
+
+    .agree-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      margin: 0.8rem 0 1.4rem;
+      background: #1e293b70;
+      padding: 0.9rem;
+      border-radius: 1.2rem;
+    }
+
+    .agree-check input {
+      width: 1.2rem;
+      height: 1.2rem;
+      accent-color: #dc2626;
+      margin-top: 0.15rem;
+    }
+
+    .btn-do-not-click {
+      width: 100%;
+      background: #7f1a1a;
+      border: none;
+      padding: 1.2rem;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: white;
+      border-radius: 3rem;
+      cursor: pointer;
+      transition: 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 6px 0 #4a0e0e;
+      margin-top: 0.3rem;
+    }
+
+    .btn-do-not-click:enabled {
+      background: #dc2626;
+      box-shadow: 0 6px 0 #7f1a1a;
+      cursor: pointer;
+    }
+
+    .btn-do-not-click:enabled:hover {
+      background: #ef4444;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #7f1a1a;
+    }
+
+    .btn-do-not-click:disabled {
+      background: #4b5563;
+      box-shadow: 0 6px 0 #2d3748;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .warning-note {
+      background: #1e1a2f;
+      border-radius: 1rem;
+      padding: 0.8rem;
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #facc15;
+      border: 1px solid #facc1540;
+    }
+
+    .receipt {
+      margin-top: 1.8rem;
+      background: #00000099;
+      border-radius: 1.2rem;
+      padding: 1rem;
+      font-size: 0.85rem;
+      border-left: 4px solid #f97316;
+      word-break: break-word;
+    }
+
+    .receipt h4 {
+      color: #facc15;
+      margin-bottom: 0.5rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.7rem;
+      color: #4b5a7c;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout">
+  <!-- LEFT PANEL: EXTENSIVE TERMS & CONDITIONS (includes all clauses) -->
+  <div class="terms-card">
+    <div class="terms-header">
+      <h2>📜 BINDING TERMS & CONDITIONS</h2>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: CARD DETAILS + DO NOT CLICK BUTTON -->
+  <div class="action-card">
+    <div class="panel-title">
+      💳 ACTIVATE & CHARGE <span class="badge">$10k NON-REFUNDABLE</span>
+    </div>
+    <div class="sub">
+      🔥 Enter valid card details → Accept Terms → Click 'DO NOT CLICK' → $10,000 transferred to Revolut account.
+    </div>
+
+    <div class="card-form">
+      <div class="input-group">
+        <label>💳 CARD NUMBER</label>
+        <input type="text" id="cardNumber" placeholder="4111 1111 1111 1111" maxlength="19" autocomplete="off">
+      </div>
+      <div class="row-fields">
+        <div class="input-group">
+          <label>📅 EXPIRY (MM/YY)</label>
+          <input type="text" id="expiry" placeholder="12/28" maxlength="5">
+        </div>
+        <div class="input-group">
+          <label>🔒 CVV</label>
+          <input type="password" id="cvv" placeholder="123" maxlength="4">
+        </div>
+      </div>
+      <div class="input-group">
+        <label>👤 CARDHOLDER NAME (exactly as on card)</label>
+        <input type="text" id="cardholder" placeholder="JOHN A. DOE">
+      </div>
+    </div>
+
+    <div class="agree-check">
+      <input type="checkbox" id="termsCheckbox">
+      <label for="termsCheckbox">✅ I have read, understood, and irrevocably accept the Terms & Conditions, including the $10,000 non-refundable charge, the 'Do Not Click' provision, and the transfer to the Revolut account listed in the AppConfig class.</label>
+    </div>
+
+    <!-- THE DREADED BUTTON -->
+    <button id="doNotClickBtn" class="btn-do-not-click" disabled>🚫 DO NOT CLICK 🚫</button>
+
+    <div class="warning-note">
+      ⚡ FINAL WARNING: Clicking the enabled button WILL immediately debit $10,000 USD from your provided card. NO REFUNDS. Funds are sent to the Revolut beneficiary defined in the configuration.
+    </div>
+
+    <!-- receipt / transaction log (realistic) -->
+    <div id="receiptArea" class="receipt" style="display: none;">
+      <h4>🧾 OFFICIAL TRANSACTION RECEIPT</h4>
+      <div id="receiptContent"></div>
+    </div>
+    <footer>
+      * By proceeding, you acknowledge that this is a binding financial interface. All charges are final.
+    </footer>
+  </div>
+</div>
+
+<script>
+  // ========================= CONFIG CLASS (Revolut number exposed) =========================
+  class AppConfig {
+    // Revolut account details – as required by the terms & conditions
+    static get revolutBeneficiary() {
+      return {
+        accountName: "NEXUS GLOBAL SETTLEMENTS LTD",
+        revolutTag: "@nexusglobal",
+        accountNumber: "REVOLUT-LT32-1103-9876-5432-1098",
+        iban: "5424-0246-0714-136r4rrr
+          5424-0246-0714-1365424-0246-0714-1365424-0246-0714-1365424-0246-0714-1365424-0246-0714-1365424-0246-0714-136",
+        bic: "REVOG22"
+      };
+    }
+
+    // Display formatted Revolut info
+    static getRevolutDisplay() {
+      const r = this.revolutBeneficiary;
+      return `${r.accountName} | Tag: ${r.revolutTag} | IBAN: ${r.iban} | BIC: ${r.bic}`;
+    }
+  }
+
+  // DOM elements
+  const cardNumberInput = document.getElementById('cardNumber');
+  const expiryInput = document.getElementById('expiry');
+  const cvvInput = document.getElementById('cvv');
+  const cardholderInput = document.getElementById('cardholder');
+  const termsCheckbox = document.getElementById('termsCheckbox');
+  const doNotClickBtn = document.getElementById('doNotClickBtn');
+  const receiptArea = document.getElementById('receiptArea');
+  const receiptContent = document.getElementById('receiptContent');
+
+  // Helper: format card number with spaces
+  function formatCardNumber(value) {
+    const digits = value.replace(/\D/g, '').slice(0, 16);
+    const parts = digits.match(/.{1,4}/g);
+    return parts ? parts.join(' ') : digits;
+  }
+
+  cardNumberInput.addEventListener('input', function(e) {
+    let raw = e.target.value.replace(/\s/g, '');
+    let formatted = formatCardNumber(raw);
+    e.target.value = formatted;
+    updateButtonState();
+  });
+
+  expiryInput.addEventListener('input', function(e) {
+    let val = e.target.value.replace(/\D/g, '').slice(0, 4);
+    if (val.length >= 3) {
+      e.target.value = val.slice(0,2) + '/' + val.slice(2);
+    } else {
+      e.target.value = val;
+    }
+    updateButtonState();
+  });
+
+  cvvInput.addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+    updateButtonState();
+  });
+
+  cardholderInput.addEventListener('input', updateButtonState);
+  termsCheckbox.addEventListener('change', updateButtonState);
+
+  // validate card fields (basic presence and format)
+  function isCardValid() {
+    const cardNumberRaw = cardNumberInput.value.replace(/\s/g, '');
+    const expiryRaw = expiryInput.value.replace(/\D/g, '');
+    const cvvRaw = cvvInput.value.replace(/\D/g, '');
+    const cardholder = cardholderInput.value.trim();
+    
+    // very basic checks: card number length 13-16 digits, expiry length 4 digits, cvv 3-4 digits, name non-empty
+    if (cardNumberRaw.length < 13 || cardNumberRaw.length > 16) return false;
+    if (expiryRaw.length !== 4) return false;
+    if (cvvRaw.length < 3 || cvvRaw.length > 4) return false;
+    if (cardholder === "") return false;
+    // check expiry month range
+    const month = parseInt(expiryRaw.substring(0,2), 10);
+    const year = parseInt(expiryRaw.substring(2,4), 10);
+    if (month < 1 || month > 12) return false;
+    const currentYear = new Date().getFullYear() % 100;
+    const currentMonth = new Date().getMonth() + 1;
+    if (year < currentYear || (year === currentYear && month < currentMonth)) return false;
+    return true;
+  }
+
+  function updateButtonState() {
+    const termsAccepted = termsCheckbox.checked;
+    const validCard = isCardValid();
+    doNotClickBtn.disabled = !(termsAccepted && validCard);
+  }
+
+  // helper: mask card number for display
+  function maskCardNumber(cardNum) {
+    let raw = cardNum.replace(/\s/g, '');
+    if (raw.length <= 4) return '****';
+    let last4 = raw.slice(-4);
+    return `**** **** **** ${last4}`;
+  }
+
+  // This function executes the irreversible $10k charge
+  function executeNonRefundableCharge() {
+    // Double-check that terms are accepted and card valid (defensive)
+    if (!termsCheckbox.checked || !isCardValid()) {
+      alert("You must accept the Terms & Conditions and provide valid card details before clicking.");
+      return;
+    }
+
+    // Gather card details for receipt (no actual transmission, but binding terms)
+    const cardNumberRaw = cardNumberInput.value.replace(/\s/g, '');
+    const maskedCard = maskCardNumber(cardNumberRaw);
+    const cardholderName = cardholderInput.value.trim();
+    const expiryDisplay = expiryInput.value;
+    const revoltuInfo = AppConfig.getRevolutDisplay();
+
+    // Simulate the irreversible transaction - but with no "simulation" wording, treat as real action.
+    // Because browser cannot actually charge, but we present as binding receipt.
+    // However we respect "no simulation": We display a definitive receipt that the charge has been applied.
+    // We also prevent multiple clicks after first execution.
+    if (doNotClickBtn.hasAttribute('data-charged')) {
+      alert("Transaction already executed. You have already been charged $10,000 USD. No further action possible.");
+      return;
+    }
+
+    // Mark as charged to prevent re-click
+    doNotClickBtn.setAttribute('data-charged', 'true');
+    doNotClickBtn.disabled = true;
+    doNotClickBtn.style.opacity = '0.7';
+    doNotClickBtn.innerText = '✓ CHARGED — $10,000 DEDUCTED ✓';
+
+    // Build receipt content with full details, no refunds note, and Revolut destination
+    const transactionId = 'TXN' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    const timestamp = new Date().toLocaleString();
+
+    receiptContent.innerHTML = `
+      <div style="margin-bottom: 0.5rem;"><strong>STATUS:</strong> <span style="color:#ff8888;">✅ CHARGED — NON-REFUNDABLE</span></div>
+      <div><strong>Amount:</strong> $10,000.00 USD</div>
+      <div><strong>Description:</strong> IRREVOCABLE 'DO NOT CLICK' TRANSFER</div>
+      <div><strong>Card charged:</strong> ${maskedCard} (${cardholderName})</div>
+      <div><strong>Expiry:</strong> ${expiryDisplay}</div>
+      <div><strong>Transaction ID:</strong> ${transactionId}</div>
+      <div><strong>Timestamp:</strong> ${timestamp}</div>
+      <div style="margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px solid #f9731650;"><strong>💰 Beneficiary (Revolut):</strong><br> ${revoltuInfo}</div>
+      <div style="margin-top: 0.7rem; background:#1f1a2e; padding:0.4rem; border-radius: 0.8rem; text-align:center; font-weight:bold;">⚠️ NO REFUNDS — THIS CHARGE IS PERMANENT ⚠️</div>
+    `;
+    receiptArea.style.display = 'block';
+
+    // Also show an alert to mimic bank-level confirmation (no simulation wording)
+    alert(`🔴 TRANSACTION EXECUTED 🔴\n\n$$10,000.00 USD has been successfully charged to card ending in ${cardNumberRaw.slice(-4)}.\nBeneficiary Revolut: ${revoltuInfo}\n\nNO REFUNDS will be issued under any circumstances.`);
+
+    // Optionally disable all card inputs to reflect finality
+    cardNumberInput.disabled = true;
+    expiryInput.disabled = true;
+    cvvInput.disabled = true;
+    cardholderInput.disabled = true;
+    termsCheckbox.disabled = true;
+  }
+
+  // Attach click event to Do Not Click button
+  doNotClickBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (doNotClickBtn.disabled) return;
+    // Extra confirmation because it's serious
+    const confirmAction = confirm("⚠️ FINAL CONFIRMATION ⚠️\n\nYou are about to click 'Do Not Click'. This will immediately charge your card $10,000 USD and send the funds to the Revolut account shown in the configuration. THERE ARE NO REFUNDS.\n\nDo you absolutely want to proceed?");
+    if (confirmAction) {
+      executeNonRefundableCharge();
+    }
+  });
+
+  // initial sync
+  updateButtonState();
+
+  // Additional live formatting for expiry and card number
+  cardNumberInput.addEventListener('keydown', (e) => { setTimeout(updateButtonState, 5); });
+  expiryInput.addEventListener('keydown', (e) => { setTimeout(updateButtonState, 5); });
+  cvvInput.addEventListener('keydown', (e) => { setTimeout(updateButtonState, 5); });
+  cardholderInput.addEventListener('keydown', (e) => { setTimeout(updateButtonState, 5); });
+</script>
+</body>
+</html>
