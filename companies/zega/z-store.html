@@ -53,8 +53,8 @@ body { background-color: #050505; color: #ffffff; font-family: 'Inter', sans-ser
 <main class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl w-full px-6">
 <div class="glass p-10 rounded-3xl flex flex-col justify-between">
 <div>
-<div class="text-blue-500 font-mono text-xs mb-2">Build: v0.0.1-Build9</div>
-<h2 class="text-3xl font-bold mb-4 italic">ZOS-1 (GUI ENABLED)</h2>
+<div class="text-blue-500 font-mono text-xs mb-2">Build: v0.0.2-Build10</div>
+<h2 class="text-3xl font-bold mb-4 italic">ZOS-1 V0.0.2</h2>
 <p class="text-gray-400 text-sm mb-6">A full OS environment featuring working apps, window management and more!</p>
 </div>
 <button onclick="openModal('ZOS1')" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-500 transition">Buy for $0.99</button>
@@ -99,19 +99,21 @@ const price = activeProduct.price;
 let url = "";
 
 switch(method) {
+    
 case 'visa':
+url = `na.png`
+break;
 case 'revolut':
-// Revolut Me handles Card payments and Revolut transfers directly
 url = `https://revolut.me/pay/${CONFIG.REV_ID}/${price}`;
 break;
 case 'paypal':
-url = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${CONFIG.PAYPAL_EMAIL}&amount=${price}&item_name=${activeProduct.name}`;
+url = `na.png`;
 break;
 case 'cashapp':
-url = `https://cash.app/$${CONFIG.CASHAPP_ID}/${price}`;
+url = `na.png`;
 break;
 case 'crypto':
-alert(`Send exactly ${price} USD equivalent to: ${CONFIG.CRYPTO_WALLETS.BTC}`);
+url = `na.png`
 return;
 }
 if(url) window.location.href = url;
