@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hex Music Lab XR + EQ</title>
+    <title>Zyper Music Studio Spatial XR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, collection, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const DEFAULT_CONFIG = {
@@ -26,13 +25,12 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'hex-music-lab';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'zyper-music-studio';
 
         window.dbInstance = db;
         window.appIdentifier = appId;
         window.authInstance = auth;
         
-        // Expose Firebase functions globally for the main script
         window.collection = collection;
         window.doc = doc;
         window.setDoc = setDoc;
@@ -51,38 +49,43 @@
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen font-sans selection:bg-zinc-800 selection:text-white select-none overflow-x-hidden">
     <div class="max-w-7xl mx-auto px-4 py-6">
-        <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 border-b border-zinc-850 pb-5">
+        <header class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 border-b border-zinc-900 pb-5">
             <div>
-                <h1 class="text-2xl font-black tracking-wider bg-gradient-to-r from-zinc-100 to-zinc-500 bg-clip-text text-transparent">HEX MUSIC LAB Spatial</h1>
-                <p class="text-xs text-zinc-500 mt-1 uppercase tracking-widest font-mono">2D • 3D • Immersive WebXR Sequencer + Studio EQ</p>
+                <h1 class="text-2xl font-black tracking-wider bg-gradient-to-r from-zinc-100 via-zinc-400 to-zinc-600 bg-clip-text text-transparent uppercase">Zyper Music Studio</h1>
+                <p class="text-[10px] text-zinc-500 mt-1 uppercase tracking-widest font-mono">Spatial Orchestra Sequencer • Studio EQ • Warm Acoustic Models • MP4 Creator</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
+                <button id="btn-info-toggle" class="px-3.5 py-2 border border-zinc-800 hover:bg-zinc-900 text-zinc-300 font-bold font-mono text-xs rounded-xl flex items-center gap-2 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    GUIDE & MANIFESTO
+                </button>
                 <button id="btn-xr-toggle" class="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold font-mono text-xs rounded-xl flex items-center gap-2 shadow-lg transition-all hidden">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                     LAUNCH IMMERSIVE VR
                 </button>
-                <div id="connection-status" class="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full text-[11px] text-zinc-400 font-mono">
+                <div id="connection-status" class="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 border border-zinc-850 rounded-full text-[11px] text-zinc-400 font-mono">
                     <span class="w-2 h-2 rounded-full bg-zinc-600 animate-pulse"></span>
-                    Connecting...
+                    Connecting Space...
                 </div>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-9 space-y-6">
-                <div class="bg-zinc-900 border border-zinc-855 rounded-2xl p-5 shadow-xl">
+                <!-- Main Sequencer Panel -->
+                <div class="bg-zinc-900/90 border border-zinc-850 rounded-2xl p-5 shadow-xl">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div class="flex items-center gap-2">
                             <button id="btn-play" class="px-5 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold rounded-xl shadow transition-all flex items-center gap-2 text-sm">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
                                 PLAY
                             </button>
-                            <button id="btn-stop" class="p-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl transition-colors">
+                            <button id="btn-stop" class="p-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-750 rounded-xl transition-colors">
                                 <svg class="w-4 h-4 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H10a1 1 0 01-1-1v-4z"/></svg>
                             </button>
                         </div>
 
-                        <div class="flex flex-wrap items-center gap-4 bg-zinc-950/60 border border-zinc-800 px-3.5 py-2 rounded-xl">
+                        <div class="flex flex-wrap items-center gap-4 bg-zinc-950/60 border border-zinc-850 px-3.5 py-2 rounded-xl">
                             <div class="flex items-center gap-2.5">
                                 <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider font-mono">BPM</label>
                                 <input type="range" id="bpm-slider" min="60" max="180" value="120" class="w-20 md:w-24 h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white">
@@ -96,72 +99,86 @@
                         </div>
 
                         <div class="flex items-center gap-2">
-                            <button id="btn-export" class="px-3 py-2 text-xs font-bold uppercase tracking-wider font-mono text-zinc-350 hover:text-white border border-zinc-800 hover:bg-zinc-850 rounded-xl transition-all flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                Export MP3
-                            </button>
-                            <button id="btn-clear" class="px-3.5 py-2 text-xs font-bold uppercase tracking-wider font-mono text-zinc-400 hover:text-white border border-zinc-800 hover:bg-zinc-850 rounded-xl transition-all">
-                                Reset
+                            <button id="btn-clear" class="px-3 py-1.5 text-xs font-bold uppercase tracking-wider font-mono text-zinc-400 hover:text-white border border-zinc-800 hover:bg-zinc-850 rounded-xl transition-all">
+                                Reset Grid
                             </button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5 bg-zinc-950/40 p-4 rounded-xl border border-zinc-855">
                         <div>
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Preset (10 Slots)</label>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Preset Orchestra</label>
                             <select id="preset-select" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-zinc-500 font-mono">
-                                <option value="empty">-- Empty Grid --</option>
-                                <option value="techno">Minimal Techno</option>
-                                <option value="electro">Electro Funk</option>
-                                <option value="ambient">Ambient Chords</option>
-                                <option value="synthwave">Synthwave Outrun</option>
-                                <option value="dnb">Drum & Bass Break</option>
-                                <option value="lofi">Jazz Hop / Lo-Fi</option>
-                                <option value="house">Deep House Groove</option>
-                                <option value="dubstep">Dubstep / Grime</option>
-                                <option value="acid">Acid Trance Trip</option>
-                                <option value="pop">Pop Ballad</option>
+                                <option value="empty">-- Empty Orchestra --</option>
+                                <option value="aurnce">The Aurnce</option>
+                                <option value="minimal">Atmospheric Flute Session</option>
+                                <option value="fantasy">Celestial Violin Echoes</option>
+                                <option value="cinematic">Epic Horn & Brass Drama</option>
+                                <option value="deep_techno">Deep Techno Loop</option>
+                                <option value="chillhop">Chillhop Lounge</option>
+                                <option value="retrowave">Neon Retrowave</option>
+                                <option value="glitch_hop">Glitch Hop Crunch</option>
+                                <option value="ambient_space">Stellar Ambient Space</option>
+                                <option value="dnb">Liquid Drum & Bass</option>
+                                <option value="industrial">Harsh Industrial Grind</option>
+                                <option value="classical">Neoclassical Chamber</option>
+                                <option value="electro_swing">Vintage Electro Swing</option>
+                                <option value="future_bass">Celestial Future Bass</option>
+                                <option value="minimalist_piano">Spacious Glass Piano</option>
+                                <option value="cyberpunk">Cyberpunk Acid Grid</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Trumpet Mode</label>
-                            <select id="trumpet-mode" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-zinc-500 font-mono">
-                                <option value="open">Open Brass</option>
-                                <option value="muted">Harmon Muted</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Grid Length</label>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Grid Sequence Length</label>
                             <div class="flex rounded-lg bg-zinc-900 p-0.5 border border-zinc-800">
-                                <button id="btn-steps-16" class="flex-1 py-1 text-[11px] font-bold font-mono rounded bg-zinc-800 text-white transition-all">16 steps</button>
-                                <button id="btn-steps-32" class="flex-1 py-1 text-[11px] font-bold font-mono rounded text-zinc-500 hover:text-zinc-300 transition-all">32 steps</button>
+                                <button id="btn-steps-16" class="flex-1 py-1 text-[11px] font-bold font-mono rounded bg-zinc-800 text-white transition-all">16 Steps</button>
+                                <button id="btn-steps-32" class="flex-1 py-1 text-[11px] font-bold font-mono rounded text-zinc-500 hover:text-zinc-300 transition-all">32 Steps</button>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Echos / Delay</label>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Echos / Feedback</label>
                             <div class="flex items-center gap-2 py-1">
                                 <input type="checkbox" id="delay-toggle" class="w-3.5 h-3.5 accent-white rounded border-zinc-800 bg-zinc-900 cursor-pointer">
-                                <span class="text-[11px] font-mono text-zinc-400">Feedback:</span>
+                                <span class="text-[11px] font-mono text-zinc-400">Delay:</span>
                                 <input type="range" id="delay-feedback" min="0" max="80" value="40" class="flex-1 h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1.5">Limiter Guard</label>
+                            <div class="flex items-center gap-2 py-1.5">
+                                <input type="checkbox" id="limiter-toggle" checked class="w-3.5 h-3.5 accent-white rounded border-zinc-800 bg-zinc-900 cursor-pointer">
+                                <span class="text-[11px] font-mono text-zinc-400">Soft Master Limit</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="flex border-b border-zinc-800 mb-4 font-mono text-xs overflow-x-auto whitespace-nowrap scrollbar-none">
-                        <button id="tab-lead" class="tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-white text-white transition-all">
+                        <button id="tab-synth" class="tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-white text-white transition-all">
                             LEAD SYNTH
                         </button>
-                        <button id="tab-trumpet" class="tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-transparent text-zinc-500 hover:text-zinc-350 transition-all">
-                            TRUMPET (BRASS)
+                        <button id="tab-flute" class="tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 transition-all">
+                            FLUTE
                         </button>
-                        <button id="tab-bass" class="tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-transparent text-zinc-500 hover:text-zinc-350 transition-all">
+                        <button id="tab-violin" class="tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 transition-all">
+                            VIOLIN
+                        </button>
+                        <button id="tab-horn" class="tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 transition-all">
+                            HORN
+                        </button>
+                        <button id="tab-bass" class="tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 transition-all">
                             BASSLINE
                         </button>
-                        <button id="tab-drums" class="tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-transparent text-zinc-500 hover:text-zinc-350 transition-all">
+                        <button id="tab-drums" class="tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 transition-all">
                             DRUMS
                         </button>
                     </div>
 
+                    <!-- Active Instrument Controls Panel -->
+                    <div id="instrument-controls" class="bg-zinc-950/60 border border-zinc-855 rounded-xl p-4 mb-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
+                        <!-- Custom controls dynamically rendered here -->
+                    </div>
+
+                    <!-- Sequence Grid and playhead -->
                     <div id="grid-container" class="relative overflow-x-auto pb-2 scrollbar-thin">
                         <div class="min-w-[760px] px-1">
                             <div id="sequencer-grid" class="grid gap-1 mb-3"></div>
@@ -170,46 +187,47 @@
                     </div>
                 </div>
 
-                <div class="bg-zinc-900 border border-zinc-855 rounded-2xl p-5 shadow-xl">
+                <!-- Spatial 3D Scene Container -->
+                <div class="bg-zinc-900 border border-zinc-850 rounded-2xl p-5 shadow-xl">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xs font-bold font-mono tracking-widest text-zinc-400 uppercase">3D Interactive Spatial View</h3>
-                        <p class="text-[10px] text-zinc-500 font-mono uppercase">Drag to Rotate • Scroll to Zoom</p>
+                        <h3 class="text-xs font-bold font-mono tracking-widest text-zinc-400 uppercase">Interactive Spatial 3D Matrix</h3>
+                        <p class="text-[10px] text-zinc-500 font-mono uppercase">Click nodes to toggle • Drag to rotate space</p>
                     </div>
-                    <div class="relative w-full h-[280px] bg-zinc-950 rounded-xl overflow-hidden border border-zinc-855">
+                    <div class="relative w-full h-[320px] bg-zinc-950 rounded-xl overflow-hidden border border-zinc-855">
                         <div id="three-container" class="w-full h-full"></div>
                     </div>
                 </div>
             </div>
 
             <div class="lg:col-span-3 space-y-6">
-                <!-- Studio Equalizer Card -->
-                <div class="bg-zinc-900 border border-zinc-855 rounded-2xl p-5 shadow-xl">
+                <!-- parametric EQ Panel -->
+                <div class="bg-zinc-900 border border-zinc-850 rounded-2xl p-5 shadow-xl">
                     <h2 class="text-xs font-bold font-mono tracking-widest mb-3.5 text-zinc-300 flex items-center gap-2 uppercase">
                         <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                        Studio Equalizer
+                        Studio Mastering Equalizer
                     </h2>
                     <div class="space-y-4">
-                        <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-855 relative">
-                            <canvas id="eq-visualizer" class="w-full h-16 bg-zinc-950 rounded-lg block"></canvas>
+                        <div class="bg-zinc-950 p-2 rounded-xl border border-zinc-850 relative">
+                            <canvas id="eq-visualizer" class="w-full h-20 bg-zinc-950 rounded-lg block"></canvas>
                         </div>
                         <div class="space-y-3">
                             <div>
                                 <div class="flex justify-between text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-wider mb-1">
-                                    <span>BASS (320Hz)</span>
+                                    <span>Bass (250Hz)</span>
                                     <span id="eq-low-val">0 dB</span>
                                 </div>
                                 <input type="range" id="eq-low" min="-12" max="12" value="0" step="1" class="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white">
                             </div>
                             <div>
                                 <div class="flex justify-between text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-wider mb-1">
-                                    <span>MID (1000Hz)</span>
+                                    <span>Mid (1200Hz)</span>
                                     <span id="eq-mid-val">0 dB</span>
                                 </div>
                                 <input type="range" id="eq-mid" min="-12" max="12" value="0" step="1" class="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white">
                             </div>
                             <div>
                                 <div class="flex justify-between text-[9px] font-bold font-mono text-zinc-500 uppercase tracking-wider mb-1">
-                                    <span>TREBLE (3200Hz)</span>
+                                    <span>Treble (4500Hz)</span>
                                     <span id="eq-high-val">0 dB</span>
                                 </div>
                                 <input type="range" id="eq-high" min="-12" max="12" value="0" step="1" class="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white">
@@ -218,24 +236,45 @@
                     </div>
                 </div>
 
-                <!-- AI Song Creator Card -->
-                <div class="bg-zinc-900 border border-zinc-855 rounded-2xl p-5 shadow-xl">
+                <!-- Premium HD MP4 Studio Video Export Card -->
+                <div class="bg-zinc-900 border border-zinc-850 rounded-2xl p-5 shadow-xl">
                     <h2 class="text-xs font-bold font-mono tracking-widest mb-3.5 text-zinc-300 flex items-center gap-2 uppercase">
-                        <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                        AI Song Creator
+                        <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        MP4 Spectrum Studio
                     </h2>
-                    <div class="space-y-3">
-                        <textarea id="ai-prompt" placeholder="Describe a song idea (e.g., 'Fast lofi hip hop with muted trumpet' or 'Epic cinematic synthwave')" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-100 text-xs focus:outline-none focus:border-zinc-500 transition-colors h-16 resize-none font-mono" rows="2"></textarea>
-                        <button id="btn-generate-ai" class="w-full py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold rounded-xl transition-all shadow text-xs font-mono flex items-center justify-center gap-1.5">
-                            Generate Pattern
+                    <div class="space-y-4">
+                        <div class="border border-dashed border-zinc-800 bg-zinc-950 p-3 rounded-xl hover:border-zinc-700 transition-colors cursor-pointer text-center relative" id="drop-zone">
+                            <input type="file" id="cover-file" accept="image/png, image/jpeg, image/gif" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                            <div class="space-y-1">
+                                <svg class="w-6 h-6 mx-auto text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span class="block text-[10px] font-bold text-zinc-400 tracking-wide uppercase font-mono">Import Cover Art</span>
+                                <span class="block text-[9px] text-zinc-600 font-mono">PNG, JPEG, GIF</span>
+                            </div>
+                        </div>
+                        <div id="file-preview-container" class="hidden">
+                            <div class="flex items-center gap-2.5 p-2 bg-zinc-950 rounded-xl border border-zinc-800">
+                                <img id="cover-preview" src="" class="w-10 h-10 object-cover rounded-lg border border-zinc-800">
+                                <div class="truncate text-[10px] font-mono">
+                                    <p id="cover-filename" class="text-zinc-300 font-bold truncate">filename.png</p>
+                                    <button id="btn-remove-cover" class="text-zinc-500 hover:text-zinc-300 underline font-mono">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-2.5 bg-zinc-950/80 rounded-xl border border-zinc-850 font-mono text-[9px] text-zinc-500 space-y-1 leading-relaxed">
+                            <span class="text-zinc-400 font-bold block">1 kHz - 21 kHz RENDER:</span>
+                            The dynamic visualizer measures the exact physical audio pressure overlay from 1,000 Hz to 21,000 Hz mapped to discrete frequency bars.
+                        </div>
+                        <button id="btn-export-mp4" class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold rounded-xl transition-all shadow text-xs font-mono uppercase flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Export Studio MP4
                         </button>
                     </div>
                 </div>
 
-                <!-- Publish Spatial Card -->
-                <div class="bg-zinc-900 border border-zinc-855 rounded-2xl p-5 shadow-xl">
+                <!-- Sync and Cloud Publisher Card -->
+                <div class="bg-zinc-900 border border-zinc-850 rounded-2xl p-5 shadow-xl">
                     <h2 class="text-xs font-bold font-mono tracking-widest mb-3.5 text-zinc-300 flex items-center gap-2 uppercase">
-                        <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                        <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
                         Publish Spatial
                     </h2>
                     <div class="space-y-3.5">
@@ -247,17 +286,17 @@
                             <label class="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider font-mono mb-1">Producer</label>
                             <input type="text" id="input-creator" placeholder="Anonymous Entity" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-100 text-xs focus:outline-none focus:border-zinc-400 transition-colors">
                         </div>
-                        <button id="btn-save" class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold rounded-xl transition-all shadow text-xs font-mono">
+                        <button id="btn-save" class="w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold rounded-xl transition-all shadow text-xs font-mono uppercase">
                             Sync to Cloud
                         </button>
                     </div>
                 </div>
 
-                <!-- Shared Matrix Space Card -->
-                <div class="bg-zinc-900 border border-zinc-855 rounded-2xl p-5 shadow-xl">
+                <!-- Saved Tracks / Shared Matrix Space -->
+                <div class="bg-zinc-900 border border-zinc-850 rounded-2xl p-5 shadow-xl">
                     <h2 class="text-xs font-bold font-mono tracking-widest mb-3 text-zinc-300 flex items-center gap-2 uppercase">
                         <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                        Shared Matrix Space
+                        Shared Orchestra Space
                     </h2>
                     <div id="saved-tracks-list" class="space-y-2.5 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin">
                         <div class="text-center py-6 text-zinc-600 text-[10px] font-mono">
@@ -269,19 +308,75 @@
         </div>
     </div>
 
+    <!-- Info/Guide Modal -->
+    <div id="info-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start border-b border-zinc-800 pb-4">
+                <div>
+                    <h3 class="text-lg font-black tracking-wider uppercase bg-gradient-to-r from-zinc-100 to-zinc-500 bg-clip-text text-transparent">Zyper Music Studio Onboarding Guide</h3>
+                    <p class="text-[9px] font-mono text-zinc-500 uppercase tracking-widest mt-0.5">Learn • Discover • Compose</p>
+                </div>
+                <button id="btn-info-close" class="text-zinc-500 hover:text-white p-1 rounded-lg hover:bg-zinc-800 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="space-y-5 font-mono text-[11px] text-zinc-300 leading-relaxed">
+                <section class="space-y-2">
+                    <h4 class="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white"></span> How to Use It
+                    </h4>
+                    <p class="pl-3.5">
+                        1. Click on the grid blocks above to toggle musical steps for your currently active instrument tab. Use the bottom playhead row to view current sequence positioning.<br>
+                        2. Use the parameters tab panel to dynamically customize physical parameters of each instrument sound.<br>
+                        3. Drop inside a cover art file (PNG, JPEG, GIF) and click "Export Studio MP4" to instantly compile a visually synced 1kHz - 21kHz spectrum analysis video.
+                    </p>
+                </section>
+
+                <section class="space-y-2">
+                    <h4 class="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white"></span> How it Works
+                    </h4>
+                    <p class="pl-3.5">
+                        Zyper utilizes the high-precision browser-native <strong class="text-white">Web Audio API</strong> to compile physical audio models (using delay waveguide loops, lowpass feedback damping, and noise-burst filters). The <strong class="text-white">Three.js and WebXR</strong> engines simultaneously parse active musical coordinate layers, enabling virtual physical mapping in standard 3D space and immersive virtual reality environments.
+                    </p>
+                </section>
+
+                <section class="space-y-2">
+                    <h4 class="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-white"></span> Why We Made It
+                    </h4>
+                    <p class="pl-3.5">
+                        Zyper Music Studio was created to bridge the gap between abstract 2D step sequencers and physical 3D spatial environments. By providing seamless accessibility across desktop, mobile, and WebXR headsets alongside high-fidelity visualization exports, we hope to democratize generative composition workflows.
+                    </p>
+                </section>
+            </div>
+
+            <div class="border-t border-zinc-800 pt-4 flex justify-end">
+                <button id="btn-modal-close-action" class="px-5 py-2 bg-white text-zinc-950 font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-zinc-200 transition-colors font-mono">
+                    Close Guide
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden audio capture canvas for MP4 export -->
+    <canvas id="export-render-canvas" class="hidden" width="1280" height="720"></canvas>
+
     <script>
         let STEPS = 16;
-        const LEAD_NOTES = ['C5', 'A4', 'G4', 'E4', 'D4', 'C4', 'A3', 'G3'];
-        const TRUMPET_NOTES = ['C5', 'Bb4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'];
+        const SYNTH_NOTES = ['C5', 'A4', 'G4', 'E4', 'D4', 'C4', 'A3', 'G3'];
+        const FLUTE_NOTES = ['E5', 'D5', 'C5', 'A4', 'G4', 'E4', 'D4', 'C4'];
+        const VIOLIN_NOTES = ['A5', 'G5', 'E5', 'D5', 'C5', 'A4', 'E4', 'C4'];
+        const HORN_NOTES = ['G4', 'F4', 'E4', 'D4', 'C4', 'G3', 'F3', 'E3'];
         const BASS_NOTES = ['C3', 'A2', 'G2', 'E2', 'D2', 'C2', 'A1', 'G1'];
         const DRUM_LABELS = ['Hi-Hat', 'Snare', 'Kick'];
 
         const NOTE_FREQS = {
-            'C5': 523.25, 'Bb4': 466.16, 'A4': 440.00, 'G4': 392.00, 'F4': 349.23, 'E4': 329.63, 'D4': 293.66, 'C4': 261.63, 'A3': 220.00, 'G3': 196.00,
-            'E3': 164.81, 'D3': 146.83, 'C3': 130.81, 'A2': 110.00, 'G2': 98.00, 'E2': 82.41, 'D2': 73.42, 'C2': 65.41, 'A1': 55.00, 'G1': 49.00
+            'E5': 659.25, 'D5': 587.33, 'C5': 523.25, 'B4': 493.88, 'A4': 440.00, 'G4': 392.00, 'F4': 349.23, 'E4': 329.63, 'D4': 293.66, 'C4': 261.63, 'A3': 220.00, 'G3': 196.00, 'F3': 174.61, 'E3': 164.81, 'D3': 146.83, 'C3': 130.81, 'A2': 110.00, 'G2': 98.00, 'E2': 82.41, 'D2': 73.42, 'C2': 65.41, 'A1': 55.00, 'G1': 49.00, 'A5': 880.00, 'G5': 783.99
         };
 
-        let currentTab = 'lead';
+        let currentTab = 'synth';
         let isPlaying = false;
         let bpm = 120;
         let volume = 0.7;
@@ -295,14 +390,29 @@
         let masterGain = null;
         let delayNode = null;
         let delayFeedback = null;
+        let masterLimiter = null;
         
         let lowEQ = null;
         let midEQ = null;
         let highEQ = null;
         let analyser = null;
 
+        let uploadedImage = null;
+
+        // Dynamic customizations for Zyper instruments (each contains more than 3 parameters)
+        const instrumentParams = {
+            synth: { wave: 'sawtooth', cutoff: 2000, attack: 0.05, decay: 0.2, sustain: 0.5, release: 0.3 },
+            flute: { noiseLevel: 0.35, pitchMod: 5, flutterRate: 7, resonance: 400 },
+            violin: { bowSpeed: 0.8, attackTime: 0.25, vibratoDepth: 3, chorusDetune: 4 },
+            horn: { dynamicFilter: 1.5, flareAttack: 0.12, warmth: 0.8, detune: 6 },
+            bass: { cutoff: 350, resonance: 4, decay: 0.15, drive: 0.3 },
+            drums: { hihatDecay: 0.08, snareCrisp: 0.5, kickPitch: 50, decayTime: 0.2 }
+        };
+
         let leadPattern = Array(8).fill().map(() => Array(32).fill(false));
-        let trumpetPattern = Array(8).fill().map(() => Array(32).fill(false));
+        let flutePattern = Array(8).fill().map(() => Array(32).fill(false));
+        let violinPattern = Array(8).fill().map(() => Array(32).fill(false));
+        let hornPattern = Array(8).fill().map(() => Array(32).fill(false));
         let bassPattern = Array(8).fill().map(() => Array(32).fill(false));
         let drumPattern = Array(3).fill().map(() => Array(32).fill(false));
 
@@ -313,11 +423,10 @@
         let raycaster = new THREE.Raycaster();
         let mouse = new THREE.Vector2();
 
-        // Elegant alternative to browser native alerts
         const showStatusToast = (message, isError = false) => {
             const toast = document.createElement('div');
             toast.className = `fixed bottom-6 right-6 px-4 py-3 rounded-xl border font-mono text-xs transition-all duration-300 transform translate-y-10 opacity-0 z-50 flex items-center gap-2 ${
-                isError ? 'bg-rose-950/90 border-rose-800 text-rose-200' : 'bg-zinc-900/90 border-zinc-700 text-zinc-100'
+                isError ? 'bg-rose-950/90 border-rose-800 text-rose-200' : 'bg-zinc-900/90 border-zinc-800 text-zinc-100'
             }`;
             toast.innerHTML = `
                 <span class="w-1.5 h-1.5 rounded-full ${isError ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-ping'}"></span>
@@ -336,15 +445,19 @@
         };
 
         const getActivePattern = () => {
-            if (currentTab === 'lead') return leadPattern;
-            if (currentTab === 'trumpet') return trumpetPattern;
+            if (currentTab === 'synth') return leadPattern;
+            if (currentTab === 'flute') return flutePattern;
+            if (currentTab === 'violin') return violinPattern;
+            if (currentTab === 'horn') return hornPattern;
             if (currentTab === 'bass') return bassPattern;
             return drumPattern;
         };
 
         const getActiveLabels = () => {
-            if (currentTab === 'lead') return LEAD_NOTES;
-            if (currentTab === 'trumpet') return TRUMPET_NOTES;
+            if (currentTab === 'synth') return SYNTH_NOTES;
+            if (currentTab === 'flute') return FLUTE_NOTES;
+            if (currentTab === 'violin') return VIOLIN_NOTES;
+            if (currentTab === 'horn') return HORN_NOTES;
             if (currentTab === 'bass') return BASS_NOTES;
             return DRUM_LABELS;
         };
@@ -357,22 +470,22 @@
             
             lowEQ = audioCtx.createBiquadFilter();
             lowEQ.type = 'lowshelf';
-            lowEQ.frequency.setValueAtTime(320, audioCtx.currentTime);
+            lowEQ.frequency.setValueAtTime(250, audioCtx.currentTime);
             lowEQ.gain.setValueAtTime(parseFloat(document.getElementById('eq-low').value), audioCtx.currentTime);
 
             midEQ = audioCtx.createBiquadFilter();
             midEQ.type = 'peaking';
             midEQ.Q.setValueAtTime(1.0, audioCtx.currentTime);
-            midEQ.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            midEQ.frequency.setValueAtTime(1200, audioCtx.currentTime);
             midEQ.gain.setValueAtTime(parseFloat(document.getElementById('eq-mid').value), audioCtx.currentTime);
 
             highEQ = audioCtx.createBiquadFilter();
             highEQ.type = 'highshelf';
-            highEQ.frequency.setValueAtTime(3200, audioCtx.currentTime);
+            highEQ.frequency.setValueAtTime(4500, audioCtx.currentTime);
             highEQ.gain.setValueAtTime(parseFloat(document.getElementById('eq-high').value), audioCtx.currentTime);
 
             analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 128;
+            analyser.fftSize = 1024;
 
             delayNode = audioCtx.createDelay(1.0);
             delayFeedback = audioCtx.createGain();
@@ -386,11 +499,17 @@
             delayNode.connect(delayFeedback);
             delayFeedback.connect(delayNode);
             
+            masterLimiter = audioCtx.createDynamicsCompressor();
+            masterLimiter.threshold.setValueAtTime(-1.0, audioCtx.currentTime);
+            masterLimiter.knee.setValueAtTime(5.0, audioCtx.currentTime);
+            masterLimiter.ratio.setValueAtTime(12.0, audioCtx.currentTime);
+            masterLimiter.attack.setValueAtTime(0.003, audioCtx.currentTime);
+            masterLimiter.release.setValueAtTime(0.08, audioCtx.currentTime);
+
             masterGain.connect(lowEQ);
             lowEQ.connect(midEQ);
             midEQ.connect(highEQ);
             highEQ.connect(analyser);
-            analyser.connect(audioCtx.destination);
             
             updateDelayRouting();
             startVisualizer();
@@ -399,7 +518,10 @@
         const updateDelayRouting = () => {
             if (!audioCtx) return;
             const delayEnabled = document.getElementById('delay-toggle').checked;
+            const useLimiter = document.getElementById('limiter-toggle').checked;
+            
             try {
+                analyser.disconnect();
                 highEQ.disconnect(delayNode);
                 delayNode.disconnect(analyser);
             } catch(e) {}
@@ -408,10 +530,17 @@
                 highEQ.connect(delayNode);
                 delayNode.connect(analyser);
             }
+
+            if (useLimiter) {
+                analyser.connect(masterLimiter);
+                masterLimiter.connect(audioCtx.destination);
+            } else {
+                analyser.connect(audioCtx.destination);
+            }
         };
 
         const triggerNoiseBuffer = () => {
-            const bufferSize = audioCtx.sampleRate * 0.4;
+            const bufferSize = audioCtx.sampleRate * 1.5;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
             for (let i = 0; i < bufferSize; i++) {
@@ -420,22 +549,117 @@
             return buffer;
         };
 
-        const playLeadNote = (freq, time) => {
+        const playSynthTrack = (freq, time) => {
+            const params = instrumentParams.synth;
             const osc = audioCtx.createOscillator();
+            const filter = audioCtx.createBiquadFilter();
             const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(masterGain);
-            osc.type = 'triangle';
+
+            osc.type = params.wave;
             osc.frequency.setValueAtTime(freq, time);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(params.cutoff, time);
+
             gain.gain.setValueAtTime(0, time);
-            gain.gain.linearRampToValueAtTime(0.25, time + 0.015);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
+            gain.gain.linearRampToValueAtTime(0.2, time + params.attack);
+            gain.gain.setValueAtTime(0.2, time + params.attack);
+            gain.gain.exponentialRampToValueAtTime(0.2 * params.sustain, time + params.attack + params.decay);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + params.attack + params.decay + params.release);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(masterGain);
+
             osc.start(time);
-            osc.stop(time + 0.25);
+            osc.stop(time + params.attack + params.decay + params.release + 0.1);
         };
 
-        const playTrumpetNote = (freq, time) => {
-            const mode = document.getElementById('trumpet-mode').value;
+        const playFluteTrack = (freq, time) => {
+            const params = instrumentParams.flute;
+            const osc = audioCtx.createOscillator();
+            const waveFilter = audioCtx.createBiquadFilter();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, time);
+
+            const vibratoOsc = audioCtx.createOscillator();
+            const vibratoGain = audioCtx.createGain();
+            vibratoOsc.frequency.setValueAtTime(params.flutterRate, time);
+            vibratoGain.gain.setValueAtTime(params.pitchMod, time);
+            vibratoOsc.connect(vibratoGain);
+            vibratoGain.connect(osc.frequency);
+
+            waveFilter.type = 'lowpass';
+            waveFilter.frequency.setValueAtTime(params.resonance, time);
+
+            gain.gain.setValueAtTime(0, time);
+            gain.gain.linearRampToValueAtTime(0.35, time + 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.45);
+
+            osc.connect(waveFilter);
+            waveFilter.connect(gain);
+            gain.connect(masterGain);
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = triggerNoiseBuffer();
+            const noiseFilter = audioCtx.createBiquadFilter();
+            noiseFilter.type = 'highpass';
+            noiseFilter.frequency.setValueAtTime(2000, time);
+            const noiseGain = audioCtx.createGain();
+            noiseGain.gain.setValueAtTime(params.noiseLevel * 0.15, time);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.35);
+
+            noise.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(masterGain);
+
+            vibratoOsc.start(time);
+            osc.start(time);
+            noise.start(time);
+            vibratoOsc.stop(time + 0.6);
+            osc.stop(time + 0.6);
+            noise.stop(time + 0.6);
+        };
+
+        const playViolinTrack = (freq, time) => {
+            const params = instrumentParams.violin;
+            const osc = audioCtx.createOscillator();
+            const filter = audioCtx.createBiquadFilter();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, time);
+
+            const lfo = audioCtx.createOscillator();
+            const lfoGain = audioCtx.createGain();
+            lfo.frequency.setValueAtTime(5.5, time);
+            lfoGain.gain.setValueAtTime(params.vibratoDepth, time);
+            lfo.connect(lfoGain);
+            lfoGain.connect(osc.frequency);
+
+            filter.type = 'peaking';
+            filter.frequency.setValueAtTime(1500, time);
+            filter.Q.setValueAtTime(0.7, time);
+
+            gain.gain.setValueAtTime(0, time);
+            gain.gain.linearRampToValueAtTime(0.3 * params.bowSpeed, time + params.attackTime);
+            gain.gain.setValueAtTime(0.3 * params.bowSpeed, time + params.attackTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.65);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(masterGain);
+
+            lfo.start(time);
+            osc.start(time);
+            lfo.stop(time + 0.8);
+            osc.stop(time + 0.8);
+        };
+
+        const playHornTrack = (freq, time) => {
+            const params = instrumentParams.horn;
             const osc1 = audioCtx.createOscillator();
             const osc2 = audioCtx.createOscillator();
             const filter = audioCtx.createBiquadFilter();
@@ -443,25 +667,17 @@
 
             osc1.type = 'sawtooth';
             osc2.type = 'sawtooth';
-            
             osc1.frequency.setValueAtTime(freq, time);
-            osc2.frequency.setValueAtTime(freq * 1.004, time);
+            osc2.frequency.setValueAtTime(freq + params.detune, time);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(300, time);
+            filter.frequency.exponentialRampToValueAtTime(2200 * params.dynamicFilter, time + params.flareAttack);
+            filter.frequency.exponentialRampToValueAtTime(500, time + 0.5);
 
             gain.gain.setValueAtTime(0, time);
-            gain.gain.linearRampToValueAtTime(0.2, time + 0.07);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.38);
-
-            if (mode === 'muted') {
-                filter.type = 'bandpass';
-                filter.frequency.setValueAtTime(1600, time);
-                filter.Q.setValueAtTime(4.0, time);
-            } else {
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(freq * 1.5, time);
-                filter.frequency.exponentialRampToValueAtTime(freq * 5.5, time + 0.08);
-                filter.frequency.exponentialRampToValueAtTime(freq * 1.2, time + 0.35);
-                filter.Q.setValueAtTime(1.8, time);
-            }
+            gain.gain.linearRampToValueAtTime(0.4 * params.warmth, time + params.flareAttack);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.6);
 
             osc1.connect(filter);
             osc2.connect(filter);
@@ -470,50 +686,58 @@
 
             osc1.start(time);
             osc2.start(time);
-            osc1.stop(time + 0.4);
-            osc2.stop(time + 0.4);
+            osc1.stop(time + 0.7);
+            osc2.stop(time + 0.7);
         };
 
-        const playBassNote = (freq, time) => {
+        const playBassTrack = (freq, time) => {
+            const params = instrumentParams.bass;
             const osc = audioCtx.createOscillator();
             const filter = audioCtx.createBiquadFilter();
             const gain = audioCtx.createGain();
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, time);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(params.cutoff, time);
+            filter.Q.setValueAtTime(params.resonance, time);
+
+            gain.gain.setValueAtTime(0, time);
+            gain.gain.linearRampToValueAtTime(0.4 * (1.0 + params.drive), time + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + params.decay + 0.1);
+
             osc.connect(filter);
             filter.connect(gain);
             gain.connect(masterGain);
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(freq, time);
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(320, time);
-            filter.frequency.exponentialRampToValueAtTime(70, time + 0.12);
-            gain.gain.setValueAtTime(0, time);
-            gain.gain.linearRampToValueAtTime(0.35, time + 0.01);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
+
             osc.start(time);
-            osc.stop(time + 0.25);
+            osc.stop(time + params.decay + 0.2);
         };
 
-        const playKick = (time) => {
+        const playKickDrum = (time) => {
+            const params = instrumentParams.drums;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(masterGain);
-            osc.frequency.setValueAtTime(130, time);
-            osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.12);
+            osc.frequency.setValueAtTime(params.kickPitch + 60, time);
+            osc.frequency.exponentialRampToValueAtTime(0.01, time + params.decayTime);
             gain.gain.setValueAtTime(0.9, time);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.14);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + params.decayTime);
             osc.start(time);
-            osc.stop(time + 0.15);
+            osc.stop(time + params.decayTime + 0.05);
         };
 
-        const playSnare = (time) => {
+        const playSnareDrum = (time) => {
+            const params = instrumentParams.drums;
             const noise = audioCtx.createBufferSource();
             noise.buffer = triggerNoiseBuffer();
             const noiseFilter = audioCtx.createBiquadFilter();
             noiseFilter.type = 'bandpass';
             noiseFilter.frequency.value = 1100;
             const noiseGain = audioCtx.createGain();
-            noiseGain.gain.setValueAtTime(0.3, time);
+            noiseGain.gain.setValueAtTime(0.3 * params.snareCrisp, time);
             noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.12);
             noise.connect(noiseFilter);
             noiseFilter.connect(noiseGain);
@@ -533,7 +757,8 @@
             osc.stop(time + 0.12);
         };
 
-        const playHiHat = (time) => {
+        const playHiHatDrum = (time) => {
+            const params = instrumentParams.drums;
             const noise = audioCtx.createBufferSource();
             noise.buffer = triggerNoiseBuffer();
             const filter = audioCtx.createBiquadFilter();
@@ -541,174 +766,43 @@
             filter.frequency.value = 7500;
             const gain = audioCtx.createGain();
             gain.gain.setValueAtTime(0.18, time);
-            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.04);
+            gain.gain.exponentialRampToValueAtTime(0.01, time + params.hihatDecay);
             noise.connect(filter);
             filter.connect(gain);
             gain.connect(masterGain);
             noise.start(time);
-            noise.stop(time + 0.08);
-        };
-
-        const triggerNoiseBufferOffline = (ctx) => {
-            const bufferSize = ctx.sampleRate * 0.4;
-            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-            return buffer;
-        };
-
-        const playLeadNoteOffline = (ctx, dest, freq, time) => {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(dest);
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq, time);
-            gain.gain.setValueAtTime(0, time);
-            gain.gain.linearRampToValueAtTime(0.25, time + 0.015);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
-            osc.start(time);
-            osc.stop(time + 0.25);
-        };
-
-        const playTrumpetNoteOffline = (ctx, dest, freq, time) => {
-            const mode = document.getElementById('trumpet-mode').value;
-            const osc1 = ctx.createOscillator();
-            const osc2 = ctx.createOscillator();
-            const filter = ctx.createBiquadFilter();
-            const gain = ctx.createGain();
-
-            osc1.type = 'sawtooth';
-            osc2.type = 'sawtooth';
-            osc1.frequency.setValueAtTime(freq, time);
-            osc2.frequency.setValueAtTime(freq * 1.004, time);
-
-            gain.gain.setValueAtTime(0, time);
-            gain.gain.linearRampToValueAtTime(0.2, time + 0.07);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.38);
-
-            if (mode === 'muted') {
-                filter.type = 'bandpass';
-                filter.frequency.setValueAtTime(1600, time);
-                filter.Q.setValueAtTime(4.0, time);
-            } else {
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(freq * 1.5, time);
-                filter.frequency.exponentialRampToValueAtTime(freq * 5.5, time + 0.08);
-                filter.frequency.exponentialRampToValueAtTime(freq * 1.2, time + 0.35);
-                filter.Q.setValueAtTime(1.8, time);
-            }
-
-            osc1.connect(filter);
-            osc2.connect(filter);
-            filter.connect(gain);
-            gain.connect(dest);
-
-            osc1.start(time);
-            osc2.start(time);
-            osc1.stop(time + 0.4);
-            osc2.stop(time + 0.4);
-        };
-
-        const playBassNoteOffline = (ctx, dest, freq, time) => {
-            const osc = ctx.createOscillator();
-            const filter = ctx.createBiquadFilter();
-            const gain = ctx.createGain();
-            osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(dest);
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(freq, time);
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(320, time);
-            filter.frequency.exponentialRampToValueAtTime(70, time + 0.12);
-            gain.gain.setValueAtTime(0, time);
-            gain.gain.linearRampToValueAtTime(0.35, time + 0.01);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
-            osc.start(time);
-            osc.stop(time + 0.25);
-        };
-
-        const playKickOffline = (ctx, dest, time) => {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(dest);
-            osc.frequency.setValueAtTime(130, time);
-            osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.12);
-            gain.gain.setValueAtTime(0.9, time);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.14);
-            osc.start(time);
-            osc.stop(time + 0.15);
-        };
-
-        const playSnareOffline = (ctx, dest, time) => {
-            const noise = ctx.createBufferSource();
-            noise.buffer = triggerNoiseBufferOffline(ctx);
-            const noiseFilter = ctx.createBiquadFilter();
-            noiseFilter.type = 'bandpass';
-            noiseFilter.frequency.value = 1100;
-            const noiseGain = ctx.createGain();
-            noiseGain.gain.setValueAtTime(0.3, time);
-            noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.12);
-            noise.connect(noiseFilter);
-            noiseFilter.connect(noiseGain);
-            noiseGain.connect(dest);
-
-            const osc = ctx.createOscillator();
-            const oscGain = ctx.createGain();
-            osc.frequency.value = 175;
-            oscGain.gain.setValueAtTime(0.15, time);
-            oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.08);
-            osc.connect(oscGain);
-            oscGain.connect(dest);
-
-            noise.start(time);
-            osc.start(time);
-            noise.stop(time + 0.15);
-            osc.stop(time + 0.12);
-        };
-
-        const playHiHatOffline = (ctx, dest, time) => {
-            const noise = ctx.createBufferSource();
-            noise.buffer = triggerNoiseBufferOffline(ctx);
-            const filter = ctx.createBiquadFilter();
-            filter.type = 'highpass';
-            filter.frequency.value = 7500;
-            const gain = ctx.createGain();
-            gain.gain.setValueAtTime(0.18, time);
-            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.04);
-            noise.connect(filter);
-            filter.connect(gain);
-            gain.connect(dest);
-            noise.start(time);
-            noise.stop(time + 0.08);
+            noise.stop(time + params.hihatDecay + 0.02);
         };
 
         const scheduleStep = (step, time) => {
             for (let i = 0; i < 8; i++) {
                 if (leadPattern[i][step]) {
-                    const freq = NOTE_FREQS[LEAD_NOTES[i]];
-                    playLeadNote(freq, time);
+                    playSynthTrack(NOTE_FREQS[SYNTH_NOTES[i]], time);
                 }
             }
             for (let i = 0; i < 8; i++) {
-                if (trumpetPattern[i][step]) {
-                    const freq = NOTE_FREQS[TRUMPET_NOTES[i]];
-                    playTrumpetNote(freq, time);
+                if (flutePattern[i][step]) {
+                    playFluteTrack(NOTE_FREQS[FLUTE_NOTES[i]], time);
+                }
+            }
+            for (let i = 0; i < 8; i++) {
+                if (violinPattern[i][step]) {
+                    playViolinTrack(NOTE_FREQS[VIOLIN_NOTES[i]], time);
+                }
+            }
+            for (let i = 0; i < 8; i++) {
+                if (hornPattern[i][step]) {
+                    playHornTrack(NOTE_FREQS[HORN_NOTES[i]], time);
                 }
             }
             for (let i = 0; i < 8; i++) {
                 if (bassPattern[i][step]) {
-                    const freq = NOTE_FREQS[BASS_NOTES[i]];
-                    playBassNote(freq, time);
+                    playBassTrack(NOTE_FREQS[BASS_NOTES[i]], time);
                 }
             }
-            if (drumPattern[0][step]) playHiHat(time);
-            if (drumPattern[1][step]) playSnare(time);
-            if (drumPattern[2][step]) playKick(time);
+            if (drumPattern[0][step]) playHiHatDrum(time);
+            if (drumPattern[1][step]) playSnareDrum(time);
+            if (drumPattern[2][step]) playKickDrum(time);
         };
 
         const scheduler = () => {
@@ -732,11 +826,11 @@
             const indicators = document.querySelectorAll('.playhead-indicator');
             indicators.forEach((ind, idx) => {
                 if (idx === step) {
-                    ind.classList.remove('bg-zinc-800');
+                    ind.classList.remove('bg-zinc-855');
                     ind.classList.add('bg-white', 'shadow-glow');
                 } else {
                     ind.classList.remove('bg-white', 'shadow-glow');
-                    ind.classList.add('bg-zinc-800');
+                    ind.classList.add('bg-zinc-855');
                 }
             });
 
@@ -750,6 +844,171 @@
                     playheadMesh.visible = false;
                 }
             }
+        };
+
+        const renderInstrumentControls = () => {
+            const container = document.getElementById('instrument-controls');
+            container.innerHTML = '';
+
+            const params = instrumentParams[currentTab];
+            
+            if (currentTab === 'synth') {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Waveform</label>
+                        <select id="ctrl-wave" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-zinc-300 font-mono text-[10px]">
+                            <option value="sawtooth" ${params.wave === 'sawtooth' ? 'selected' : ''}>Sawtooth</option>
+                            <option value="triangle" ${params.wave === 'triangle' ? 'selected' : ''}>Triangle</option>
+                            <option value="square" ${params.wave === 'square' ? 'selected' : ''}>Square</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Cutoff (${params.cutoff}Hz)</label>
+                        <input type="range" id="ctrl-cutoff" min="100" max="6000" step="50" value="${params.cutoff}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Attack (${params.attack}s)</label>
+                        <input type="range" id="ctrl-attack" min="0.01" max="1" step="0.01" value="${params.attack}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Sustain (${params.sustain})</label>
+                        <input type="range" id="ctrl-sustain" min="0.1" max="1" step="0.05" value="${params.sustain}" class="w-full accent-white">
+                    </div>
+                `;
+            } else if (currentTab === 'flute') {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Breath Noise (${params.noiseLevel})</label>
+                        <input type="range" id="ctrl-noise" min="0" max="1" step="0.05" value="${params.noiseLevel}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Pitch Mod (${params.pitchMod})</label>
+                        <input type="range" id="ctrl-pitchmod" min="1" max="25" step="1" value="${params.pitchMod}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Flutter Rate (${params.flutterRate}Hz)</label>
+                        <input type="range" id="ctrl-flutter" min="2" max="18" step="1" value="${params.flutterRate}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Chamber Res (${params.resonance}Hz)</label>
+                        <input type="range" id="ctrl-chamber" min="100" max="2000" step="50" value="${params.resonance}" class="w-full accent-white">
+                    </div>
+                `;
+            } else if (currentTab === 'violin') {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Bow Force (${params.bowSpeed})</label>
+                        <input type="range" id="ctrl-bow" min="0.1" max="2.0" step="0.1" value="${params.bowSpeed}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Attack Time (${params.attackTime}s)</label>
+                        <input type="range" id="ctrl-attacktime" min="0.05" max="1.5" step="0.05" value="${params.attackTime}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Vibrato Intensity (${params.vibratoDepth})</label>
+                        <input type="range" id="ctrl-vibrato" min="0" max="15" step="1" value="${params.vibratoDepth}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Stereo Chorus (${params.chorusDetune}Hz)</label>
+                        <input type="range" id="ctrl-chorus" min="0" max="12" step="0.5" value="${params.chorusDetune}" class="w-full accent-white">
+                    </div>
+                `;
+            } else if (currentTab === 'horn') {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Brass Sweep (${params.dynamicFilter})</label>
+                        <input type="range" id="ctrl-brass" min="0.2" max="3.0" step="0.1" value="${params.dynamicFilter}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Flare Attack (${params.flareAttack}s)</label>
+                        <input type="range" id="ctrl-flare" min="0.02" max="0.6" step="0.01" value="${params.flareAttack}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Bell Warmth (${params.warmth})</label>
+                        <input type="range" id="ctrl-warmth" min="0.1" max="1.0" step="0.05" value="${params.warmth}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Dual Detune (${params.detune}Hz)</label>
+                        <input type="range" id="ctrl-detune" min="1" max="20" step="1" value="${params.detune}" class="w-full accent-white">
+                    </div>
+                `;
+            } else if (currentTab === 'bass') {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Sub Cutoff (${params.cutoff}Hz)</label>
+                        <input type="range" id="ctrl-subcutoff" min="80" max="1200" step="20" value="${params.cutoff}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Q Resonance (${params.resonance})</label>
+                        <input type="range" id="ctrl-subresonance" min="1" max="12" step="0.5" value="${params.resonance}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Sub Decay (${params.decay}s)</label>
+                        <input type="range" id="ctrl-subdecay" min="0.05" max="0.8" step="0.02" value="${params.decay}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Drive Gain (${params.drive})</label>
+                        <input type="range" id="ctrl-subdrive" min="0" max="1.0" step="0.05" value="${params.drive}" class="w-full accent-white">
+                    </div>
+                `;
+            } else if (currentTab === 'drums') {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Hat Decay (${params.hihatDecay}s)</label>
+                        <input type="range" id="ctrl-hatdecay" min="0.02" max="0.3" step="0.01" value="${params.hihatDecay}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Snare Brightness (${params.snareCrisp})</label>
+                        <input type="range" id="ctrl-snare" min="0.1" max="1.0" step="0.05" value="${params.snareCrisp}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Kick Frequency (${params.kickPitch}Hz)</label>
+                        <input type="range" id="ctrl-kickfreq" min="35" max="110" step="1" value="${params.kickPitch}" class="w-full accent-white">
+                    </div>
+                    <div>
+                        <label class="block text-zinc-500 mb-1">Kick Decay (${params.decayTime}s)</label>
+                        <input type="range" id="ctrl-kickdecay" min="0.05" max="0.5" step="0.01" value="${params.decayTime}" class="w-full accent-white">
+                    </div>
+                `;
+            }
+
+            const inputs = container.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const id = e.target.id;
+                    const val = e.target.value;
+                    
+                    if (id === 'ctrl-wave') params.wave = val;
+                    if (id === 'ctrl-cutoff') params.cutoff = parseFloat(val);
+                    if (id === 'ctrl-attack') params.attack = parseFloat(val);
+                    if (id === 'ctrl-sustain') params.sustain = parseFloat(val);
+                    
+                    if (id === 'ctrl-noise') params.noiseLevel = parseFloat(val);
+                    if (id === 'ctrl-pitchmod') params.pitchMod = parseFloat(val);
+                    if (id === 'ctrl-flutter') params.flutterRate = parseFloat(val);
+                    if (id === 'ctrl-chamber') params.resonance = parseFloat(val);
+                    
+                    if (id === 'ctrl-bow') params.bowSpeed = parseFloat(val);
+                    if (id === 'ctrl-attacktime') params.attackTime = parseFloat(val);
+                    if (id === 'ctrl-vibrato') params.vibratoDepth = parseFloat(val);
+                    if (id === 'ctrl-chorus') params.chorusDetune = parseFloat(val);
+                    
+                    if (id === 'ctrl-brass') params.dynamicFilter = parseFloat(val);
+                    if (id === 'ctrl-flare') params.flareAttack = parseFloat(val);
+                    if (id === 'ctrl-warmth') params.warmth = parseFloat(val);
+                    if (id === 'ctrl-detune') params.detune = parseFloat(val);
+                    
+                    if (id === 'ctrl-subcutoff') params.cutoff = parseFloat(val);
+                    if (id === 'ctrl-subresonance') params.resonance = parseFloat(val);
+                    if (id === 'ctrl-subdecay') params.decay = parseFloat(val);
+                    if (id === 'ctrl-subdrive') params.drive = parseFloat(val);
+                    
+                    if (id === 'ctrl-hatdecay') params.hihatDecay = parseFloat(val);
+                    if (id === 'ctrl-snare') params.snareCrisp = parseFloat(val);
+                    if (id === 'ctrl-kickfreq') params.kickPitch = parseFloat(val);
+                    if (id === 'ctrl-kickdecay') params.decayTime = parseFloat(val);
+                });
+            });
         };
 
         const renderGrid = () => {
@@ -796,7 +1055,7 @@
         const renderPlayheadRow = () => {
             const row = document.getElementById('playhead-row');
             row.innerHTML = '';
-            row.className = `grid grid-cols-[96px_repeat(${STEPS},_minmax(0,_1fr))] gap-1`;
+            row.className = `grid grid-cols-[96px_repeat(${STEPS},_minmax(0,_1fr))] gap-1.5`;
 
             const spacer = document.createElement('div');
             row.appendChild(spacer);
@@ -811,129 +1070,400 @@
         const switchTab = (tab) => {
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = 'tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-transparent text-zinc-500 hover:text-zinc-350 transition-all';
+                btn.className = 'tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 transition-all';
             });
             const activeBtn = document.getElementById(`tab-${tab}`);
             activeBtn.className = 'tab-btn px-4 py-2.5 font-bold tracking-wide border-b-2 border-white text-white transition-all';
+            
             renderGrid();
+            renderInstrumentControls();
         };
 
         const applyPreset = (presetName) => {
             leadPattern = Array(8).fill().map(() => Array(32).fill(false));
-            trumpetPattern = Array(8).fill().map(() => Array(32).fill(false));
+            flutePattern = Array(8).fill().map(() => Array(32).fill(false));
+            violinPattern = Array(8).fill().map(() => Array(32).fill(false));
+            hornPattern = Array(8).fill().map(() => Array(32).fill(false));
             bassPattern = Array(8).fill().map(() => Array(32).fill(false));
             drumPattern = Array(3).fill().map(() => Array(32).fill(false));
 
-            document.getElementById('trumpet-mode').value = "open";
+            if (presetName === 'aurnce') {
+                bpm = 136;
+                document.getElementById('delay-toggle').checked = false;
+                document.getElementById('limiter-toggle').checked = true;
 
-            if (presetName === 'techno') {
-                bpm = 126;
-                for (let i = 0; i < 32; i += 4) drumPattern[2][i] = true;
-                for (let i = 4; i < 32; i += 8) drumPattern[1][i] = true;
-                for (let i = 2; i < 32; i += 4) drumPattern[0][i] = true;
-                for (let i = 2; i < 32; i += 4) bassPattern[6][i] = true;
-                leadPattern[3][6] = true; leadPattern[2][10] = true; leadPattern[1][14] = true;
-                leadPattern[3][22] = true; leadPattern[2][26] = true; leadPattern[0][30] = true;
-                trumpetPattern[4][4] = true; trumpetPattern[5][12] = true; trumpetPattern[4][20] = true; trumpetPattern[6][28] = true;
+                // Force 16 Steps selection as seen in image_44e37e.png
+                STEPS = 16;
+                document.getElementById('btn-steps-16').className = "flex-1 py-1 text-[11px] font-bold font-mono rounded bg-zinc-800 text-white transition-all";
+                document.getElementById('btn-steps-32').className = "flex-1 py-1 text-[11px] font-bold font-mono rounded text-zinc-500 hover:text-zinc-300 transition-all";
+                build3DGrid();
 
-            } else if (presetName === 'electro') {
-                bpm = 118;
-                drumPattern[2][0] = true; drumPattern[2][6] = true; drumPattern[2][8] = true; drumPattern[2][14] = true;
-                drumPattern[2][16] = true; drumPattern[2][22] = true; drumPattern[2][24] = true; drumPattern[2][30] = true;
-                drumPattern[1][4] = true; drumPattern[1][12] = true; drumPattern[1][20] = true; drumPattern[1][28] = true;
-                for (let i = 0; i < 32; i += 2) drumPattern[0][i] = true;
+                // 1. Lead Synth Pattern matching image_44e642.png
+                leadPattern[3][1] = true;  // E4 at Col 1
+                leadPattern[2][4] = true;  // G4 at Col 4
+                leadPattern[1][7] = true;  // A4 at Col 7
+                leadPattern[2][10] = true; // G4 at Col 10
+                leadPattern[5][14] = true; // C4 at Col 14
+
+                // 2. Violin Pattern matching image_44e625.png
+                violinPattern[4][0] = true;  // C5
+                violinPattern[0][1] = true;  // A5
+                violinPattern[2][2] = true;  // E5
+                violinPattern[3][3] = true;  // D5
+                violinPattern[2][4] = true;  // E5
+                violinPattern[1][5] = true;  // G5
+                violinPattern[0][7] = true;  // A5
+                violinPattern[2][8] = true;  // E5
+                violinPattern[4][9] = true;  // C5
+                violinPattern[2][10] = true; // E5
+                violinPattern[0][11] = true; // A5
+                violinPattern[2][12] = true; // E5
+                violinPattern[3][13] = true; // D5
+                violinPattern[1][14] = true; // G5
+                violinPattern[5][15] = true; // A4
+
+                // 3. Horn Pattern matching image_44e649.png
+                hornPattern[5][3] = true;   // G3 at Col 3
+
+                // 4. Bassline Pattern matching image_44e665.png
+                bassPattern[4][5] = true;   // D2 at Col 5
+
+                // 5. Drums Pattern matching image_44e682.png
+                drumPattern[0][2] = true;   // Hi-Hat Col 2
+                drumPattern[0][6] = true;   // Hi-Hat Col 6
+                drumPattern[0][10] = true;  // Hi-Hat Col 10
+                drumPattern[0][14] = true;  // Hi-Hat Col 14
+                drumPattern[1][7] = true;   // Snare Col 7
+                drumPattern[2][3] = true;   // Kick Col 3
+                drumPattern[2][8] = true;   // Kick Col 8
+                drumPattern[2][12] = true;  // Kick Col 12
+                drumPattern[2][15] = true;  // Kick Col 15
+
+                // 6. Flute remains completely empty as seen in image_44e35c.png, but its sliders are maxed
+                instrumentParams.flute.noiseLevel = 1.0;
+                instrumentParams.flute.pitchMod = 25;
+                instrumentParams.flute.flutterRate = 18;
+                instrumentParams.flute.resonance = 2000;
+
+                // Load other instrument control parameters to match their reference visual values
+                instrumentParams.synth.wave = 'sawtooth';
+                instrumentParams.synth.cutoff = 2000;
+                instrumentParams.synth.attack = 0.05;
+                instrumentParams.synth.sustain = 0.5;
+
+                instrumentParams.violin.bowSpeed = 0.8;
+                instrumentParams.violin.attackTime = 0.25;
+                instrumentParams.violin.vibratoDepth = 3;
+                instrumentParams.violin.chorusDetune = 4;
+
+                instrumentParams.horn.dynamicFilter = 1.5;
+                instrumentParams.horn.flareAttack = 0.12;
+                instrumentParams.horn.warmth = 0.8;
+                instrumentParams.horn.detune = 6;
+
+                instrumentParams.bass.cutoff = 350;
+                instrumentParams.bass.resonance = 4;
+                instrumentParams.bass.decay = 0.15;
+                instrumentParams.bass.drive = 0.3;
+
+                instrumentParams.drums.hihatDecay = 0.08;
+                instrumentParams.drums.snareCrisp = 0.5;
+                instrumentParams.drums.kickPitch = 50;
+                instrumentParams.drums.decayTime = 0.2;
+
+                document.getElementById('eq-low').value = 0;
+                document.getElementById('eq-mid').value = 0;
+                document.getElementById('eq-high').value = 0;
+                document.getElementById('eq-low-val').innerText = "0 dB";
+                document.getElementById('eq-mid-val').innerText = "0 dB";
+                document.getElementById('eq-high-val').innerText = "0 dB";
                 
-                bassPattern[7][0] = true; bassPattern[7][3] = true; bassPattern[6][4] = true; bassPattern[5][6] = true;
-                bassPattern[7][8] = true; bassPattern[7][11] = true; bassPattern[6][12] = true; bassPattern[5][14] = true;
-                bassPattern[7][16] = true; bassPattern[7][19] = true; bassPattern[6][20] = true; bassPattern[5][22] = true;
-
-                leadPattern[4][0] = true; leadPattern[3][4] = true; leadPattern[2][8] = true; leadPattern[1][12] = true;
-                trumpetPattern[5][2] = true; trumpetPattern[3][6] = true; trumpetPattern[5][10] = true; trumpetPattern[3][14] = true;
-
-            } else if (presetName === 'ambient') {
-                bpm = 84;
-                document.getElementById('delay-toggle').checked = true;
-                leadPattern[5][0] = true; leadPattern[3][4] = true; leadPattern[1][8] = true; leadPattern[2][12] = true;
-                leadPattern[4][16] = true; leadPattern[5][20] = true; leadPattern[3][24] = true; leadPattern[0][28] = true;
-                bassPattern[5][0] = true; bassPattern[7][8] = true; bassPattern[5][16] = true; bassPattern[4][24] = true;
-                drumPattern[0][0] = true; drumPattern[0][8] = true; drumPattern[0][16] = true; drumPattern[0][24] = true;
-                trumpetPattern[0][0] = true; trumpetPattern[2][4] = true; trumpetPattern[4][8] = true; trumpetPattern[3][16] = true;
-
-            } else if (presetName === 'synthwave') {
+                if (lowEQ) lowEQ.gain.setValueAtTime(0, audioCtx.currentTime);
+                if (midEQ) midEQ.gain.setValueAtTime(0, audioCtx.currentTime);
+                if (highEQ) highEQ.gain.setValueAtTime(0, audioCtx.currentTime);
+            } else if (presetName === 'minimal') {
                 bpm = 110;
-                for (let i = 0; i < 32; i += 4) drumPattern[2][i] = true;
-                for (let i = 4; i < 32; i += 8) drumPattern[1][i] = true;
-                for (let i = 2; i < 32; i += 4) drumPattern[0][i] = true;
-                for (let i = 0; i < 32; i++) {
-                    if (i % 4 !== 0) bassPattern[6][i] = true;
+                for (let i = 0; i < 32; i += 4) {
+                    drumPattern[2][i] = true;
                 }
-                trumpetPattern[3][0] = true; trumpetPattern[3][2] = true; trumpetPattern[4][4] = true; trumpetPattern[2][8] = true;
-                trumpetPattern[3][16] = true; trumpetPattern[3][18] = true; trumpetPattern[4][20] = true; trumpetPattern[2][24] = true;
-                leadPattern[1][4] = true; leadPattern[2][12] = true; leadPattern[0][20] = true; leadPattern[3][28] = true;
+                for (let i = 4; i < 32; i += 8) {
+                    drumPattern[1][i] = true;
+                }
+                flutePattern[2][0] = true;
+                flutePattern[4][4] = true;
+                flutePattern[1][8] = true;
+                flutePattern[5][12] = true;
+                
+                bassPattern[5][0] = true;
+                bassPattern[5][4] = true;
+                bassPattern[6][8] = true;
+                bassPattern[6][12] = true;
+            } else if (presetName === 'fantasy') {
+                bpm = 95;
+                document.getElementById('delay-toggle').checked = true;
+                for (let i = 0; i < 32; i += 4) {
+                    violinPattern[i % 8][i] = true;
+                }
+                for (let i = 0; i < 32; i += 8) {
+                    violinPattern[3][i] = true;
+                    violinPattern[5][i+2] = true;
+                }
+            } else if (presetName === 'cinematic') {
+                bpm = 130;
+                for (let i = 0; i < 32; i += 4) {
+                    drumPattern[2][i] = true;
+                    drumPattern[2][i+1] = true;
+                }
+                for (let i = 0; i < 32; i += 8) {
+                    hornPattern[4][i] = true;
+                    hornPattern[2][i+4] = true;
+                }
+            } else if (presetName === 'deep_techno') {
+                bpm = 126;
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = true;
+                document.getElementById('limiter-toggle').checked = true;
+                
+                // Deep Kick Stomp
+                drumPattern[2][0] = drumPattern[2][4] = drumPattern[2][8] = drumPattern[2][12] = true;
+                // Offbeat Hats
+                drumPattern[0][2] = drumPattern[0][6] = drumPattern[0][10] = drumPattern[0][14] = true;
+                // Snare/Clap on 4 and 12
+                drumPattern[1][4] = drumPattern[1][12] = true;
+                
+                // Acid Sub-Bassline Groove
+                bassPattern[6][2] = bassPattern[6][3] = bassPattern[6][10] = bassPattern[6][11] = true;
+                bassPattern[5][6] = bassPattern[5][14] = true;
+                
+                // Hypnotic Synth Chords
+                leadPattern[5][0] = leadPattern[5][8] = true;
+                leadPattern[3][4] = leadPattern[3][12] = true;
 
+                instrumentParams.synth.wave = 'square';
+                instrumentParams.synth.cutoff = 800;
+                instrumentParams.bass.cutoff = 250;
+                instrumentParams.bass.resonance = 8;
+            } else if (presetName === 'chillhop') {
+                bpm = 82;
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = true;
+                
+                // Lazy Kick
+                drumPattern[2][0] = drumPattern[2][9] = drumPattern[2][11] = true;
+                // Lofi Snare
+                drumPattern[1][4] = drumPattern[1][12] = true;
+                // Swingy Hihats
+                for (let i = 0; i < 16; i += 2) {
+                    drumPattern[0][i] = true;
+                }
+                
+                // Warm Flute Licks
+                flutePattern[2][0] = flutePattern[4][4] = flutePattern[3][8] = flutePattern[5][12] = true;
+                
+                // Soft Violins background
+                violinPattern[4][2] = violinPattern[5][10] = true;
+                
+                // Grounding Bass
+                bassPattern[4][0] = bassPattern[5][8] = true;
+                
+                instrumentParams.flute.noiseLevel = 0.65;
+                instrumentParams.flute.resonance = 1100;
+            } else if (presetName === 'retrowave') {
+                bpm = 112;
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = false;
+                
+                // Retrowave Four-on-the-Floor Kick
+                drumPattern[2][0] = drumPattern[2][4] = drumPattern[2][8] = drumPattern[2][12] = true;
+                drumPattern[1][4] = drumPattern[1][12] = true;
+                // Constant Hats
+                for (let i = 1; i < 16; i += 2) {
+                    drumPattern[0][i] = true;
+                }
+                
+                // Driving Octave Bassline
+                for (let i = 0; i < 16; i += 2) {
+                    bassPattern[5][i] = true;
+                    bassPattern[4][i+1] = true;
+                }
+                
+                // Nostalgic Brass/Synth Lead melody
+                leadPattern[3][0] = leadPattern[1][4] = leadPattern[2][8] = leadPattern[4][12] = true;
+                instrumentParams.synth.wave = 'sawtooth';
+                instrumentParams.synth.cutoff = 2200;
+            } else if (presetName === 'glitch_hop') {
+                bpm = 110;
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = true;
+                
+                // Syncopated Heavy Beat
+                drumPattern[2][0] = drumPattern[2][6] = drumPattern[2][11] = true;
+                drumPattern[1][4] = drumPattern[1][12] = true;
+                drumPattern[0][2] = drumPattern[0][5] = drumPattern[0][10] = drumPattern[0][14] = true;
+                
+                // Aggressive Synth Stabs
+                leadPattern[1][2] = leadPattern[0][10] = true;
+                // Punchy Horn Section stabs
+                hornPattern[4][4] = hornPattern[2][12] = true;
+                
+                // Wobbling Bass
+                bassPattern[3][0] = bassPattern[5][6] = true;
+                instrumentParams.bass.drive = 0.85;
+                instrumentParams.bass.cutoff = 600;
+            } else if (presetName === 'ambient_space') {
+                bpm = 70;
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = true;
+                document.getElementById('delay-feedback').value = 75;
+                
+                // Micro-Sparse Percussion
+                drumPattern[0][0] = drumPattern[0][8] = true;
+                
+                // Long Whispering Flute Pad
+                flutePattern[3][0] = flutePattern[4][8] = true;
+                
+                // Floating Celestial Violin
+                violinPattern[1][2] = violinPattern[2][10] = true;
+                
+                // Ultra-Deep Bass Anchor
+                bassPattern[6][0] = bassPattern[7][8] = true;
+                
+                instrumentParams.flute.noiseLevel = 0.8;
+                instrumentParams.flute.flutterRate = 4;
             } else if (presetName === 'dnb') {
                 bpm = 172;
-                drumPattern[2][0] = true; drumPattern[2][10] = true; drumPattern[2][16] = true; drumPattern[2][26] = true;
-                drumPattern[1][4] = true; drumPattern[1][12] = true; drumPattern[1][20] = true; drumPattern[1][28] = true;
-                for (let i = 0; i < 32; i += 2) drumPattern[0][i] = true;
-                bassPattern[7][0] = true; bassPattern[7][2] = true; bassPattern[5][6] = true; bassPattern[6][10] = true;
-                bassPattern[7][16] = true; bassPattern[7][18] = true; bassPattern[5][22] = true; bassPattern[6][26] = true;
-                document.getElementById('trumpet-mode').value = "muted";
-                trumpetPattern[2][4] = true; trumpetPattern[1][12] = true; trumpetPattern[0][20] = true; trumpetPattern[2][28] = true;
-
-            } else if (presetName === 'lofi') {
-                bpm = 80;
-                document.getElementById('trumpet-mode').value = "muted";
-                drumPattern[2][0] = true; drumPattern[2][11] = true; drumPattern[2][16] = true; drumPattern[2][27] = true;
-                drumPattern[1][4] = true; drumPattern[1][12] = true; drumPattern[1][20] = true; drumPattern[1][28] = true;
-                drumPattern[0][2] = true; drumPattern[0][6] = true; drumPattern[0][10] = true; drumPattern[0][14] = true;
-                bassPattern[5][0] = true; bassPattern[5][4] = true; bassPattern[4][8] = true; bassPattern[3][12] = true;
-                bassPattern[5][16] = true; bassPattern[5][20] = true; bassPattern[4][24] = true; bassPattern[3][28] = true;
-                trumpetPattern[4][2] = true; trumpetPattern[3][4] = true; trumpetPattern[1][7] = true; trumpetPattern[2][10] = true;
-                trumpetPattern[0][18] = true; trumpetPattern[2][20] = true; trumpetPattern[3][23] = true; trumpetPattern[4][26] = true;
-
-            } else if (presetName === 'house') {
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = true;
+                
+                // Fast Syncopated DNB Breaks
+                drumPattern[2][0] = drumPattern[2][10] = true;
+                drumPattern[1][4] = drumPattern[1][12] = true;
+                for (let i = 0; i < 16; i += 2) {
+                    drumPattern[0][i] = true;
+                }
+                
+                // Rolling Sub Bassline
+                bassPattern[5][0] = bassPattern[5][4] = bassPattern[4][10] = true;
+                
+                // Airborn Flute Solos
+                flutePattern[1][0] = flutePattern[3][8] = true;
+                
+                instrumentParams.bass.cutoff = 180;
+                instrumentParams.flute.resonance = 1500;
+            } else if (presetName === 'industrial') {
+                bpm = 135;
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = false;
+                document.getElementById('limiter-toggle').checked = true;
+                
+                // Brutal Constant Kick
+                for (let i = 0; i < 16; i += 2) {
+                    drumPattern[2][i] = true;
+                }
+                drumPattern[1][4] = drumPattern[1][12] = true;
+                
+                // Heavily Distorted Bass Drive
+                bassPattern[6][0] = bassPattern[6][4] = bassPattern[5][8] = bassPattern[5][12] = true;
+                
+                // Piercing Saw Synths
+                leadPattern[1][0] = leadPattern[1][4] = leadPattern[0][8] = leadPattern[0][12] = true;
+                
+                instrumentParams.synth.wave = 'sawtooth';
+                instrumentParams.synth.cutoff = 3500;
+                instrumentParams.bass.drive = 1.0;
+            } else if (presetName === 'classical') {
+                bpm = 88;
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = true;
+                
+                // No drums to preserve acoustic orchestral texture
+                // Intersecting Violin Chords
+                violinPattern[1][0] = violinPattern[3][4] = violinPattern[2][8] = violinPattern[4][12] = true;
+                
+                // Supporting Horn swell melodies
+                hornPattern[3][2] = hornPattern[5][6] = hornPattern[4][10] = true;
+                
+                // Double Bass ground
+                bassPattern[4][0] = bassPattern[6][8] = true;
+                
+                instrumentParams.violin.bowSpeed = 1.3;
+                instrumentParams.violin.vibratoDepth = 8;
+            } else if (presetName === 'electro_swing') {
                 bpm = 124;
-                for (let i = 0; i < 32; i += 4) drumPattern[2][i] = true;
-                for (let i = 4; i < 32; i += 8) drumPattern[1][i] = true;
-                for (let i = 2; i < 32; i += 4) drumPattern[0][i] = true;
-                for (let i = 1; i < 32; i += 2) {
-                    if (i % 4 !== 3) bassPattern[6][i] = true;
-                }
-                trumpetPattern[3][4] = true; trumpetPattern[3][5] = true; trumpetPattern[2][12] = true; trumpetPattern[2][13] = true;
-                trumpetPattern[3][20] = true; trumpetPattern[3][21] = true; trumpetPattern[2][28] = true; trumpetPattern[2][29] = true;
-
-            } else if (presetName === 'dubstep') {
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = false;
+                
+                // Four-on-the-floor stomps with shuffle hats
+                drumPattern[2][0] = drumPattern[2][4] = drumPattern[2][8] = drumPattern[2][12] = true;
+                drumPattern[1][4] = drumPattern[1][12] = true;
+                drumPattern[0][3] = drumPattern[0][7] = drumPattern[0][11] = drumPattern[0][15] = true;
+                
+                // Bouncy Walking Bass
+                bassPattern[5][0] = bassPattern[4][4] = bassPattern[3][8] = bassPattern[4][12] = true;
+                
+                // Swung Horn Section stabs
+                hornPattern[4][1] = hornPattern[3][3] = hornPattern[5][9] = hornPattern[4][11] = true;
+                
+                instrumentParams.horn.dynamicFilter = 2.2;
+                instrumentParams.horn.flareAttack = 0.05;
+            } else if (presetName === 'future_bass') {
                 bpm = 140;
-                drumPattern[2][0] = true; drumPattern[2][14] = true; drumPattern[2][16] = true; drumPattern[2][30] = true;
-                drumPattern[1][8] = true; drumPattern[1][24] = true;
-                for (let i = 0; i < 32; i += 4) drumPattern[0][i] = true;
-                bassPattern[7][0] = true; bassPattern[7][2] = true; bassPattern[6][4] = true; bassPattern[5][6] = true;
-                bassPattern[7][16] = true; bassPattern[7][18] = true; bassPattern[4][20] = true; bassPattern[4][22] = true;
-                trumpetPattern[0][0] = true; trumpetPattern[1][2] = true; trumpetPattern[2][4] = true; trumpetPattern[3][6] = true;
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = true;
+                
+                // Slow halftime heavy drops
+                drumPattern[2][0] = drumPattern[2][8] = true;
+                drumPattern[1][4] = drumPattern[1][12] = true;
+                // Fast trap-style hats
+                drumPattern[0][0] = drumPattern[0][2] = drumPattern[0][3] = drumPattern[0][6] = drumPattern[0][8] = drumPattern[0][10] = drumPattern[0][11] = drumPattern[0][14] = true;
+                
+                // Huge dynamic lead pad swells
+                leadPattern[2][0] = leadPattern[1][4] = leadPattern[3][8] = leadPattern[2][12] = true;
+                
+                // Deep sub glide bass
+                bassPattern[4][0] = bassPattern[5][8] = true;
+                
+                instrumentParams.synth.wave = 'sawtooth';
+                instrumentParams.synth.cutoff = 2800;
+                instrumentParams.synth.attack = 0.35;
+            } else if (presetName === 'minimalist_piano') {
+                bpm = 100;
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = true;
+                document.getElementById('delay-feedback').value = 60;
+                
+                // Silent backdrop with sparse high hats
+                drumPattern[0][4] = drumPattern[0][12] = true;
+                
+                // Plucking high-register crystalline violin
+                violinPattern[0][0] = violinPattern[1][4] = violinPattern[2][8] = violinPattern[0][12] = true;
+                
+                instrumentParams.violin.attackTime = 0.05;
+                instrumentParams.violin.vibratoDepth = 1;
+            } else if (presetName === 'cyberpunk') {
+                bpm = 102;
+                STEPS = 16;
+                document.getElementById('delay-toggle').checked = false;
+                document.getElementById('limiter-toggle').checked = true;
+                
+                // Industrial heavy driving elements
+                drumPattern[2][0] = drumPattern[2][4] = drumPattern[2][8] = drumPattern[2][12] = true;
+                drumPattern[1][4] = drumPattern[1][12] = true;
+                
+                // Cyberpunk Driving Acid Synth Arpeggio
+                leadPattern[6][0] = leadPattern[5][2] = leadPattern[4][4] = leadPattern[3][6] = true;
+                leadPattern[6][8] = leadPattern[5][10] = leadPattern[4][12] = leadPattern[3][14] = true;
+                
+                // Heavy crushing bass drone
+                bassPattern[6][0] = bassPattern[5][8] = true;
+                
+                instrumentParams.synth.wave = 'sawtooth';
+                instrumentParams.synth.cutoff = 1850;
+                instrumentParams.bass.drive = 0.9;
+            }
 
-            } else if (presetName === 'acid') {
-                bpm = 138;
-                for (let i = 0; i < 32; i += 4) drumPattern[2][i] = true;
-                for (let i = 4; i < 32; i += 8) drumPattern[1][i] = true;
-                for (let i = 2; i < 32; i += 4) drumPattern[0][i] = true;
-                for (let i = 0; i < 32; i++) {
-                    if (i % 3 === 0) bassPattern[5][i] = true;
-                    if (i % 5 === 0) bassPattern[6][i] = true;
-                }
-                for (let i = 0; i < 32; i += 4) {
-                    leadPattern[1][i] = true;
-                    leadPattern[2][(i+2)%32] = true;
-                }
-
-            } else if (presetName === 'pop') {
-                bpm = 95;
-                drumPattern[2][0] = true; drumPattern[2][8] = true; drumPattern[2][16] = true; drumPattern[2][24] = true;
-                drumPattern[1][4] = true; drumPattern[1][12] = true; drumPattern[1][20] = true; drumPattern[1][28] = true;
-                for (let i = 0; i < 32; i += 4) drumPattern[0][i] = true;
-                bassPattern[6][0] = true; bassPattern[5][8] = true; bassPattern[4][16] = true; bassPattern[6][24] = true;
-                trumpetPattern[4][0] = true; trumpetPattern[3][4] = true; trumpetPattern[2][8] = true; trumpetPattern[1][12] = true;
-                trumpetPattern[0][16] = true; trumpetPattern[2][20] = true; trumpetPattern[4][24] = true; trumpetPattern[5][28] = true;
+            if (presetName !== 'empty' && presetName !== 'aurnce' && presetName !== 'minimal' && presetName !== 'fantasy' && presetName !== 'cinematic' && presetName !== 'deep_techno' && presetName !== 'chillhop' && presetName !== 'retrowave' && presetName !== 'glitch_hop' && presetName !== 'ambient_space' && presetName !== 'dnb' && presetName !== 'industrial' && presetName !== 'classical' && presetName !== 'electro_swing' && presetName !== 'future_bass' && presetName !== 'minimalist_piano' && presetName !== 'cyberpunk') {
+                return;
             }
 
             document.getElementById('bpm-slider').value = bpm;
@@ -942,8 +1472,19 @@
                 const delayTimeSec = 60.0 / bpm * 0.375;
                 delayNode.delayTime.setValueAtTime(delayTimeSec, audioCtx.currentTime);
             }
+            if (STEPS === 16) {
+                document.getElementById('btn-steps-16').className = "flex-1 py-1 text-[11px] font-bold font-mono rounded bg-zinc-800 text-white transition-all";
+                document.getElementById('btn-steps-32').className = "flex-1 py-1 text-[11px] font-bold font-mono rounded text-zinc-500 hover:text-zinc-300 transition-all";
+            } else {
+                document.getElementById('btn-steps-32').className = "flex-1 py-1 text-[11px] font-bold font-mono rounded bg-zinc-800 text-white transition-all";
+                document.getElementById('btn-steps-16').className = "flex-1 py-1 text-[11px] font-bold font-mono rounded text-zinc-500 hover:text-zinc-300 transition-all";
+            }
+            
             updateDelayRouting();
+            build3DGrid();
             renderGrid();
+            renderInstrumentControls();
+            update3DState();
         };
 
         const startVisualizer = () => {
@@ -965,15 +1506,29 @@
                 ctx.fillStyle = '#09090b';
                 ctx.fillRect(0, 0, renderWidth, renderHeight);
 
-                const barWidth = (renderWidth / bufferLength) * 1.5;
-                let barHeight;
-                let x = 0;
+                const sampleRate = audioCtx.sampleRate;
+                const minBin = Math.floor(1000 * bufferLength / (sampleRate / 2));
+                const maxBin = Math.floor(21000 * bufferLength / (sampleRate / 2));
+                
+                const rangeLength = maxBin - minBin;
+                const barCount = 32;
+                const groupSize = Math.max(1, Math.floor(rangeLength / barCount));
 
-                for (let i = 0; i < bufferLength; i++) {
-                    barHeight = (dataArray[i] / 255) * renderHeight;
-                    ctx.fillStyle = `rgb(${255 - barHeight * 2}, ${255 - barHeight * 2}, ${255 - barHeight * 2})`;
-                    ctx.fillRect(x, renderHeight - barHeight, barWidth - 1, barHeight);
-                    x += barWidth;
+                const barWidth = renderWidth / barCount;
+
+                for (let i = 0; i < barCount; i++) {
+                    let sum = 0;
+                    for (let j = 0; j < groupSize; j++) {
+                        const idx = minBin + (i * groupSize) + j;
+                        if (idx < bufferLength) {
+                            sum += dataArray[idx];
+                        }
+                    }
+                    const avg = sum / groupSize;
+                    const barHeight = (avg / 255) * renderHeight;
+                    
+                    ctx.fillStyle = `rgb(${255 - barHeight * 1.5}, ${255 - barHeight * 1.5}, ${255 - barHeight * 1.5})`;
+                    ctx.fillRect(i * barWidth, renderHeight - barHeight, barWidth - 1, barHeight);
                 }
             };
             draw();
@@ -988,7 +1543,7 @@
             scene.background = new THREE.Color(0x09090b);
 
             camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-            camera.position.set(0, 4, 12);
+            camera.position.set(0, 5, 14);
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(width, height);
@@ -1037,10 +1592,11 @@
             const geom = new THREE.BoxGeometry(0.42, 0.42, 0.25);
 
             const layers = [
-                { id: 'lead', pattern: leadPattern, rows: 8, zPos: layerDepth * 1.5, name: 'Lead' },
-                { id: 'trumpet', pattern: trumpetPattern, rows: 8, zPos: layerDepth * 0.5, name: 'Trumpet' },
-                { id: 'bass', pattern: bassPattern, rows: 8, zPos: -layerDepth * 0.5, name: 'Bass' },
-                { id: 'drums', pattern: drumPattern, rows: 3, zPos: -layerDepth * 1.5, name: 'Drums' }
+                { id: 'synth', pattern: leadPattern, rows: 8, zPos: layerDepth * 2.0, name: 'Lead' },
+                { id: 'flute', pattern: flutePattern, rows: 8, zPos: layerDepth * 1.0, name: 'Flute' },
+                { id: 'violin', pattern: violinPattern, rows: 8, zPos: 0, name: 'Violin' },
+                { id: 'horn', pattern: hornPattern, rows: 8, zPos: -layerDepth * 1.0, name: 'Horn' },
+                { id: 'bass', pattern: bassPattern, rows: 8, zPos: -layerDepth * 2.0, name: 'Bass' }
             ];
 
             layers.forEach((layer) => {
@@ -1074,7 +1630,7 @@
                 }
             });
 
-            const playheadGeom = new THREE.BoxGeometry(0.1, 5, 5.5);
+            const playheadGeom = new THREE.BoxGeometry(0.1, 5, 7.5);
             const playheadMat = new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 transparent: true,
@@ -1094,10 +1650,11 @@
                 const { layer, row, col } = cube.userData;
                 let isActive = false;
 
-                if (layer === 'lead') isActive = leadPattern[row][col];
-                else if (layer === 'trumpet') isActive = trumpetPattern[row][col];
+                if (layer === 'synth') isActive = leadPattern[row][col];
+                else if (layer === 'flute') isActive = flutePattern[row][col];
+                else if (layer === 'violin') isActive = violinPattern[row][col];
+                else if (layer === 'horn') isActive = hornPattern[row][col];
                 else if (layer === 'bass') isActive = bassPattern[row][col];
-                else if (layer === 'drums') isActive = drumPattern[row][col];
 
                 if (col >= STEPS) {
                     cube.visible = false;
@@ -1138,10 +1695,11 @@
 
                 initAudio();
 
-                if (layer === 'lead') leadPattern[row][col] = !leadPattern[row][col];
-                else if (layer === 'trumpet') trumpetPattern[row][col] = !trumpetPattern[row][col];
+                if (layer === 'synth') leadPattern[row][col] = !leadPattern[row][col];
+                else if (layer === 'flute') flutePattern[row][col] = !flutePattern[row][col];
+                else if (layer === 'violin') violinPattern[row][col] = !violinPattern[row][col];
+                else if (layer === 'horn') hornPattern[row][col] = !hornPattern[row][col];
                 else if (layer === 'bass') bassPattern[row][col] = !bassPattern[row][col];
-                else if (layer === 'drums') drumPattern[row][col] = !drumPattern[row][col];
 
                 renderGrid();
                 update3DState();
@@ -1175,13 +1733,6 @@
                 const controller2 = renderer.xr.getController(1);
                 controller2.addEventListener('selectstart', onXRSelect);
                 scene.add(controller2);
-
-                const controllerModelFactory = new THREE.Line(
-                    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -5)]),
-                    new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 })
-                );
-                controller1.add(controllerModelFactory.clone());
-                controller2.add(controllerModelFactory.clone());
             }
         };
 
@@ -1212,10 +1763,11 @@
                 const clickedObj = intersects[0].object;
                 const { layer, row, col } = clickedObj.userData;
 
-                if (layer === 'lead') leadPattern[row][col] = !leadPattern[row][col];
-                else if (layer === 'trumpet') trumpetPattern[row][col] = !trumpetPattern[row][col];
+                if (layer === 'synth') leadPattern[row][col] = !leadPattern[row][col];
+                else if (layer === 'flute') flutePattern[row][col] = !flutePattern[row][col];
+                else if (layer === 'violin') violinPattern[row][col] = !violinPattern[row][col];
+                else if (layer === 'horn') hornPattern[row][col] = !hornPattern[row][col];
                 else if (layer === 'bass') bassPattern[row][col] = !bassPattern[row][col];
-                else if (layer === 'drums') drumPattern[row][col] = !drumPattern[row][col];
 
                 renderGrid();
                 update3DState();
@@ -1229,246 +1781,224 @@
             renderer.render(scene, camera);
         };
 
-        const generateWithAI = async () => {
-            const promptInput = document.getElementById('ai-prompt').value.trim();
-            if (!promptInput) {
-                showStatusToast("Please enter an AI prompt description first!", true);
-                return;
-            }
+        const setupImageUpload = () => {
+            const dropZone = document.getElementById('drop-zone');
+            const fileInput = document.getElementById('cover-file');
+            const previewContainer = document.getElementById('file-preview-container');
+            const previewImage = document.getElementById('cover-preview');
+            const filenameLabel = document.getElementById('cover-filename');
+            const btnRemove = document.getElementById('btn-remove-cover');
 
-            const generateBtn = document.getElementById('btn-generate-ai');
-            const originalText = generateBtn.innerHTML;
-            generateBtn.disabled = true;
-            generateBtn.innerHTML = `
-                <svg class="animate-spin h-3.5 w-3.5 text-zinc-950" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Composing...
-            `;
-
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            const systemPrompt = `You are an expert AI music composer. Generate a structured JSON pattern for a 32-step musical sequence.
-Response MUST strictly match the following JSON schema:
-{
-  "name": "Short creative title",
-  "bpm": number (between 75 and 150),
-  "steps": 32,
-  "trumpetMode": "open" or "muted",
-  "leadPattern": Array of 8 arrays, each containing 32 booleans (representing rows of notes C5, A4, G4, E4, D4, C4, A3, G3),
-  "trumpetPattern": Array of 8 arrays, each containing 32 booleans (representing rows of notes C5, Bb4, A4, G4, F4, E4, D4, C4),
-  "bassPattern": Array of 8 arrays, each containing 32 booleans (representing rows of notes C3, A2, G2, E2, D2, C2, A1, G1),
-  "drumPattern": Array of 3 arrays, each containing 32 booleans (representing Hi-Hat, Snare, Kick)
-}
-Ensure the patterns sound musically coherent together. Drum layers should have clear rhythmic accents.
-Do not wrap response in markdown blocks or write conversational text. Return raw JSON string only.`;
-
-            const payload = {
-                contents: [{ parts: [{ text: `Create a song with this description: ${promptInput}` }] }],
-                generationConfig: {
-                    responseMimeType: "application/json"
-                },
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                }
+            const handleFile = (file) => {
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedImage = new Image();
+                    uploadedImage.onload = () => {
+                        previewImage.src = e.target.result;
+                        filenameLabel.innerText = file.name;
+                        previewContainer.classList.remove('hidden');
+                        dropZone.classList.add('hidden');
+                        showStatusToast("Cover art loaded successfully!");
+                    };
+                    uploadedImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
             };
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            fileInput.addEventListener('change', (e) => {
+                handleFile(e.target.files[0]);
+            });
 
-                if (!response.ok) {
-                    throw new Error("Failed to communicate with AI.");
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('border-zinc-500');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('border-zinc-500');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-zinc-500');
+                if (e.dataTransfer.files.length > 0) {
+                    handleFile(e.dataTransfer.files[0]);
                 }
+            });
 
-                const result = await response.json();
-                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!jsonText) {
-                    throw new Error("No response received from AI.");
-                }
-
-                const song = JSON.parse(jsonText);
-
-                bpm = song.bpm || 120;
-                document.getElementById('bpm-slider').value = bpm;
-                document.getElementById('bpm-val').innerText = bpm;
-
-                leadPattern = song.leadPattern;
-                trumpetPattern = song.trumpetPattern;
-                bassPattern = song.bassPattern;
-                drumPattern = song.drumPattern;
-
-                if (song.trumpetMode) {
-                    document.getElementById('trumpet-mode').value = song.trumpetMode;
-                }
-
-                STEPS = song.steps || 32;
-                if (STEPS === 32) {
-                    document.getElementById('btn-steps-32').click();
-                } else {
-                    document.getElementById('btn-steps-16').click();
-                }
-
-                document.getElementById('input-title').value = song.name || 'AI Masterpiece';
-                document.getElementById('input-creator').value = 'Gemini AI';
-
-                renderGrid();
-                update3DState();
-                showStatusToast("AI composition applied successfully!");
-
-            } catch (error) {
-                console.error("AI Composer Error:", error);
-                showStatusToast("Failed to compile AI music. Please retry.", true);
-            } finally {
-                generateBtn.disabled = false;
-                generateBtn.innerHTML = originalText;
-            }
+            btnRemove.addEventListener('click', () => {
+                uploadedImage = null;
+                fileInput.value = '';
+                previewContainer.classList.add('hidden');
+                dropZone.classList.remove('hidden');
+                showStatusToast("Cover art removed.");
+            });
         };
 
-        const audioBufferToMp3 = (audioBuffer) => {
-            const channels = 2;
-            const sampleRate = audioBuffer.sampleRate;
-            const mp3encoder = new lamejs.Mp3Encoder(channels, sampleRate, 128);
-            const mp3Data = [];
-
-            const left = audioBuffer.getChannelData(0);
-            const right = audioBuffer.getChannelData(1);
-
-            const l = new Int16Array(left.length);
-            const r = new Int16Array(right.length);
-            for (let i = 0; i < left.length; i++) {
-                l[i] = Math.max(-32768, Math.min(32767, left[i] * 32767.5));
-                r[i] = Math.max(-32768, Math.min(32767, right[i] * 32767.5));
-            }
-
-            const sampleBlockSize = 1152;
-            for (let i = 0; i < l.length; i += sampleBlockSize) {
-                const leftChunk = l.subarray(i, i + sampleBlockSize);
-                const rightChunk = r.subarray(i, i + sampleBlockSize);
-                const mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
-                if (mp3buf.length > 0) {
-                    mp3Data.push(mp3buf);
-                }
-            }
-
-            const mp3buf = mp3encoder.flush();
-            if (mp3buf.length > 0) {
-                mp3Data.push(mp3buf);
-            }
-
-            return new Blob(mp3Data, { type: 'audio/mp3' });
-        };
-
-        const exportToMp3 = async () => {
-            const exportBtn = document.getElementById('btn-export');
-            const originalText = exportBtn.innerHTML;
-            exportBtn.disabled = true;
-            exportBtn.innerHTML = `
-                <svg class="animate-spin h-3.5 w-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24">
+        const runMP4Export = async () => {
+            initAudio();
+            const btnExport = document.getElementById('btn-export-mp4');
+            const originalText = btnExport.innerHTML;
+            
+            btnExport.disabled = true;
+            btnExport.innerHTML = `
+                <svg class="animate-spin h-4 w-4 text-zinc-950" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Rendering...
+                RECORDING LOOP...
             `;
 
             try {
-                const sampleRate = 44100;
-                const secondsPerStep = 60.0 / bpm / 4.0;
-                const duration = STEPS * secondsPerStep;
+                const exportCanvas = document.getElementById('export-render-canvas');
+                const ctx = exportCanvas.getContext('2d');
                 
-                const offlineCtx = new OfflineAudioContext(2, sampleRate * duration, sampleRate);
+                const audioDest = audioCtx.createMediaStreamDestination();
+                masterGain.connect(audioDest);
+                
+                const canvasStream = exportCanvas.captureStream(30);
+                const combinedStream = new MediaStream();
+                
+                canvasStream.getVideoTracks().forEach(track => combinedStream.addTrack(track));
+                audioDest.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
 
-                const offlineMasterGain = offlineCtx.createGain();
-                offlineMasterGain.gain.setValueAtTime(volume, 0);
-
-                const offlineLowEQ = offlineCtx.createBiquadFilter();
-                offlineLowEQ.type = 'lowshelf';
-                offlineLowEQ.frequency.setValueAtTime(320, 0);
-                offlineLowEQ.gain.setValueAtTime(parseFloat(document.getElementById('eq-low').value), 0);
-
-                const offlineMidEQ = offlineCtx.createBiquadFilter();
-                offlineMidEQ.type = 'peaking';
-                offlineMidEQ.Q.setValueAtTime(1.0, 0);
-                offlineMidEQ.frequency.setValueAtTime(1000, 0);
-                offlineMidEQ.gain.setValueAtTime(parseFloat(document.getElementById('eq-mid').value), 0);
-
-                const offlineHighEQ = offlineCtx.createBiquadFilter();
-                offlineHighEQ.type = 'highshelf';
-                offlineHighEQ.frequency.setValueAtTime(3200, 0);
-                offlineHighEQ.gain.setValueAtTime(parseFloat(document.getElementById('eq-high').value), 0);
-
-                offlineMasterGain.connect(offlineLowEQ);
-                offlineLowEQ.connect(offlineMidEQ);
-                offlineMidEQ.connect(offlineHighEQ);
-                offlineHighEQ.connect(offlineCtx.destination);
-
-                const delayEnabled = document.getElementById('delay-toggle').checked;
-                if (delayEnabled) {
-                    const offlineDelayNode = offlineCtx.createDelay(1.0);
-                    offlineDelayNode.delayTime.setValueAtTime(60.0 / bpm * 0.375, 0);
-                    const offlineDelayFeedback = offlineCtx.createGain();
-                    const feedbackVal = parseFloat(document.getElementById('delay-feedback').value) / 100;
-                    offlineDelayFeedback.gain.setValueAtTime(feedbackVal, 0);
-
-                    offlineHighEQ.connect(offlineDelayNode);
-                    offlineDelayNode.connect(offlineDelayFeedback);
-                    offlineDelayFeedback.connect(offlineDelayNode);
-                    offlineDelayNode.connect(offlineCtx.destination);
+                let mimeType = 'video/webm;codecs=vp9,opus';
+                if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1,mp3')) {
+                    mimeType = 'video/mp4;codecs=avc1,mp3';
+                } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+                    mimeType = 'video/mp4';
                 }
 
-                for (let colIdx = 0; colIdx < STEPS; colIdx++) {
-                    const triggerTime = colIdx * secondsPerStep;
+                const recorder = new MediaRecorder(combinedStream, { mimeType });
+                const chunks = [];
+                
+                recorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) chunks.push(e.data);
+                };
 
-                    for (let r = 0; r < 8; r++) {
-                        if (leadPattern[r][colIdx]) {
-                            playLeadNoteOffline(offlineCtx, offlineMasterGain, NOTE_FREQS[LEAD_NOTES[r]], triggerTime);
-                        }
-                    }
-                    for (let r = 0; r < 8; r++) {
-                        if (trumpetPattern[r][colIdx]) {
-                            playTrumpetNoteOffline(offlineCtx, offlineMasterGain, NOTE_FREQS[TRUMPET_NOTES[r]], triggerTime);
-                        }
-                    }
-                    for (let r = 0; r < 8; r++) {
-                        if (bassPattern[r][colIdx]) {
-                            playBassNoteOffline(offlineCtx, offlineMasterGain, NOTE_FREQS[BASS_NOTES[r]], triggerTime);
-                        }
-                    }
-                    if (drumPattern[0][colIdx]) playHiHatOffline(offlineCtx, offlineMasterGain, triggerTime);
-                    if (drumPattern[1][colIdx]) playSnareOffline(offlineCtx, offlineMasterGain, triggerTime);
-                    if (drumPattern[2][colIdx]) playKickOffline(offlineCtx, offlineMasterGain, triggerTime);
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: mimeType });
+                    const videoURL = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = videoURL;
+                    a.download = `Zyper_Studio_Session_${Date.now()}.mp4`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(videoURL);
+                    
+                    masterGain.disconnect(audioDest);
+                    showStatusToast("Studio video successfully compiled and downloaded!");
+                    btnExport.disabled = false;
+                    btnExport.innerHTML = originalText;
+                };
+
+                const wasAlreadyPlaying = isPlaying;
+                if (!wasAlreadyPlaying) {
+                    document.getElementById('btn-play').click();
                 }
+                currentStep = 0;
+                nextStepTime = audioCtx.currentTime;
 
-                const renderedBuffer = await offlineCtx.startRendering();
-                const mp3Blob = audioBufferToMp3(renderedBuffer);
+                const durationOfLoop = (60.0 / bpm) * (STEPS / 4) * 1000;
+                
+                recorder.start();
 
-                const songName = document.getElementById('input-title').value.trim() || 'Untitled Track';
-                const url = URL.createObjectURL(mp3Blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${songName.toLowerCase().replace(/\s+/g, '-')}.mp3`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showStatusToast("Song exported successfully!");
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                let renderActive = true;
 
-            } catch (err) {
-                console.error("Export failure:", err);
-                showStatusToast("Failed to render MP3. Please check audio setup.", true);
-            } finally {
-                exportBtn.disabled = false;
-                exportBtn.innerHTML = originalText;
+                const drawLoopFrame = () => {
+                    if (!renderActive) return;
+                    requestAnimationFrame(drawLoopFrame);
+
+                    analyser.getByteFrequencyData(dataArray);
+
+                    if (uploadedImage) {
+                        ctx.drawImage(uploadedImage, 0, 0, exportCanvas.width, exportCanvas.height);
+                    } else {
+                        ctx.fillStyle = '#09090b';
+                        ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+                        ctx.strokeStyle = '#18181b';
+                        ctx.lineWidth = 1;
+                        for (let x = 0; x < exportCanvas.width; x += 40) {
+                            ctx.beginPath();
+                            ctx.moveTo(x, 0);
+                            ctx.lineTo(x, exportCanvas.height);
+                            ctx.stroke();
+                        }
+                    }
+
+                    ctx.fillStyle = 'rgba(9, 9, 11, 0.65)';
+                    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+                    const sampleRate = audioCtx.sampleRate;
+                    const minBin = Math.floor(1000 * bufferLength / (sampleRate / 2));
+                    const maxBin = Math.floor(21000 * bufferLength / (sampleRate / 2));
+                    const rangeLength = maxBin - minBin;
+
+                    const barCount = 48;
+                    const groupSize = Math.max(1, Math.floor(rangeLength / barCount));
+                    const availableWidth = exportCanvas.width - 160;
+                    const barWidth = availableWidth / barCount;
+
+                    for (let i = 0; i < barCount; i++) {
+                        let sum = 0;
+                        for (let j = 0; j < groupSize; j++) {
+                            const idx = minBin + (i * groupSize) + j;
+                            if (idx < bufferLength) {
+                                sum += dataArray[idx];
+                            }
+                        }
+                        const avg = sum / groupSize;
+                        const scaleHeight = (avg / 255) * 280;
+                        
+                        ctx.fillStyle = `rgba(255, 255, 255, ${0.15 + (scaleHeight / 280) * 0.85})`;
+                        ctx.fillRect(80 + (i * barWidth), exportCanvas.height - 180 - scaleHeight, barWidth - 4, scaleHeight);
+                    }
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 24px monospace';
+                    const titleText = document.getElementById('input-title').value.trim() || 'Untitled Session';
+                    const creatorText = document.getElementById('input-creator').value.trim() || 'Anonymous';
+                    ctx.fillText(titleText.toUpperCase(), 80, 80);
+
+                    ctx.fillStyle = '#a1a1aa';
+                    ctx.font = '14px monospace';
+                    ctx.fillText(`STUDIO: ZYPER MUSIC STUDIO | PRODUCER: ${creatorText.toUpperCase()} | BPM: ${bpm} | RANGE: 1 kHz - 21 kHz`, 80, 115);
+
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(80, 140);
+                    ctx.lineTo(exportCanvas.width - 80, 140);
+                    ctx.stroke();
+                };
+
+                drawLoopFrame();
+
+                setTimeout(() => {
+                    renderActive = false;
+                    recorder.stop();
+                    if (!wasAlreadyPlaying) {
+                        document.getElementById('btn-stop').click();
+                    }
+                }, durationOfLoop + 300);
+
+            } catch(e) {
+                console.error(e);
+                showStatusToast("Failed to compile studio MP4 file.", true);
+                btnExport.disabled = false;
+                btnExport.innerHTML = originalText;
             }
         };
 
-        document.getElementById('tab-lead').addEventListener('click', () => switchTab('lead'));
-        document.getElementById('tab-trumpet').addEventListener('click', () => switchTab('trumpet'));
+        document.getElementById('tab-synth').addEventListener('click', () => switchTab('synth'));
+        document.getElementById('tab-flute').addEventListener('click', () => switchTab('flute'));
+        document.getElementById('tab-violin').addEventListener('click', () => switchTab('violin'));
+        document.getElementById('tab-horn').addEventListener('click', () => switchTab('horn'));
         document.getElementById('tab-bass').addEventListener('click', () => switchTab('bass'));
         document.getElementById('tab-drums').addEventListener('click', () => switchTab('drums'));
 
@@ -1490,6 +2020,11 @@ Do not wrap response in markdown blocks or write conversational text. Return raw
         });
 
         document.getElementById('delay-toggle').addEventListener('change', () => {
+            initAudio();
+            updateDelayRouting();
+        });
+
+        document.getElementById('limiter-toggle').addEventListener('change', () => {
             initAudio();
             updateDelayRouting();
         });
@@ -1583,14 +2118,32 @@ Do not wrap response in markdown blocks or write conversational text. Return raw
 
         document.getElementById('btn-clear').addEventListener('click', () => {
             leadPattern = Array(8).fill().map(() => Array(32).fill(false));
-            trumpetPattern = Array(8).fill().map(() => Array(32).fill(false));
+            flutePattern = Array(8).fill().map(() => Array(32).fill(false));
+            violinPattern = Array(8).fill().map(() => Array(32).fill(false));
+            hornPattern = Array(8).fill().map(() => Array(32).fill(false));
             bassPattern = Array(8).fill().map(() => Array(32).fill(false));
             drumPattern = Array(3).fill().map(() => Array(32).fill(false));
             renderGrid();
         });
 
-        document.getElementById('btn-generate-ai').addEventListener('click', generateWithAI);
-        document.getElementById('btn-export').addEventListener('click', exportToMp3);
+        document.getElementById('btn-export-mp4').addEventListener('click', runMP4Export);
+
+        const infoModal = document.getElementById('info-modal');
+        const btnInfoToggle = document.getElementById('btn-info-toggle');
+        const btnInfoClose = document.getElementById('btn-info-close');
+        const btnModalCloseAction = document.getElementById('btn-modal-close-action');
+
+        const toggleInfoModal = (show) => {
+            if (show) {
+                infoModal.classList.remove('pointer-events-none', 'opacity-0');
+            } else {
+                infoModal.classList.add('pointer-events-none', 'opacity-0');
+            }
+        };
+
+        btnInfoToggle.addEventListener('click', () => toggleInfoModal(true));
+        btnInfoClose.addEventListener('click', () => toggleInfoModal(false));
+        btnModalCloseAction.addEventListener('click', () => toggleInfoModal(false));
 
         const setupSync = () => {
             const checkReady = setInterval(() => {
@@ -1602,12 +2155,12 @@ Do not wrap response in markdown blocks or write conversational text. Return raw
                     
                     window.authInstance.onAuthStateChanged((user) => {
                         if (user) {
-                            statusDot.className = "w-2 h-2 rounded-full bg-zinc-300";
-                            statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-zinc-300"></span> Connected`;
+                            statusDot.className = "w-2 h-2 rounded-full bg-zinc-350";
+                            statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-zinc-350"></span> Zyper Cloud Active`;
                             subscribeToSongs();
                         } else {
                             statusDot.className = "w-2 h-2 rounded-full bg-zinc-600";
-                            statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-zinc-600"></span> Authing...`;
+                            statusText.innerHTML = `<span class="w-2 h-2 rounded-full bg-zinc-600"></span> Synching Auth...`;
                         }
                     });
                 }
@@ -1621,7 +2174,7 @@ Do not wrap response in markdown blocks or write conversational text. Return raw
                 list.innerHTML = '';
                 
                 if (snapshot.empty) {
-                    list.innerHTML = '<div class="text-center py-6 text-zinc-600 text-[10px] font-mono">No shared tracks yet.</div>';
+                    list.innerHTML = '<div class="text-center py-6 text-zinc-600 text-[10px] font-mono">No shared matrices yet.</div>';
                     return;
                 }
 
@@ -1643,7 +2196,7 @@ Do not wrap response in markdown blocks or write conversational text. Return raw
                     item.innerHTML = `
                         <div class="truncate pr-2 font-mono text-[11px]">
                             <h4 class="font-bold text-zinc-200 truncate">${song.name || 'Untitled'}</h4>
-                            <p class="text-[9px] text-zinc-500 truncate uppercase tracking-wider">By ${song.author || 'Anonymous'} • ${song.bpm || 120} bpm • ${song.steps || 16} steps</p>
+                            <p class="text-[9px] text-zinc-500 truncate uppercase tracking-wider">By ${song.author || 'Anonymous'} • ${song.bpm || 120} bpm</p>
                         </div>
                         <span class="text-[10px] text-zinc-400 font-bold shrink-0 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800 font-mono hover:text-white">LOAD</span>
                     `;
@@ -1654,15 +2207,11 @@ Do not wrap response in markdown blocks or write conversational text. Return raw
                         document.getElementById('bpm-val').innerText = bpm;
                         
                         leadPattern = JSON.parse(song.leadPattern);
-                        trumpetPattern = song.trumpetPattern ? JSON.parse(song.trumpetPattern) : (song.guitarPattern ? JSON.parse(song.guitarPattern) : Array(8).fill().map(() => Array(32).fill(false)));
+                        flutePattern = song.flutePattern ? JSON.parse(song.flutePattern) : Array(8).fill().map(() => Array(32).fill(false));
+                        violinPattern = song.violinPattern ? JSON.parse(song.violinPattern) : Array(8).fill().map(() => Array(32).fill(false));
+                        hornPattern = song.hornPattern ? JSON.parse(song.hornPattern) : Array(8).fill().map(() => Array(32).fill(false));
                         bassPattern = JSON.parse(song.bassPattern);
                         drumPattern = JSON.parse(song.drumPattern);
-
-                        if (song.trumpetMode) {
-                            document.getElementById('trumpet-mode').value = song.trumpetMode;
-                        } else if (song.guitarMode) {
-                            document.getElementById('trumpet-mode').value = song.guitarMode === 'classical' ? 'muted' : 'open';
-                        }
 
                         STEPS = song.steps || 16;
                         if (STEPS === 32) {
@@ -1699,9 +2248,10 @@ Do not wrap response in markdown blocks or write conversational text. Return raw
                 author: creator,
                 bpm: bpm,
                 steps: STEPS,
-                trumpetMode: document.getElementById('trumpet-mode').value,
                 leadPattern: JSON.stringify(leadPattern),
-                trumpetPattern: JSON.stringify(trumpetPattern),
+                flutePattern: JSON.stringify(flutePattern),
+                violinPattern: JSON.stringify(violinPattern),
+                hornPattern: JSON.stringify(hornPattern),
                 bassPattern: JSON.stringify(bassPattern),
                 drumPattern: JSON.stringify(drumPattern),
                 createdAt: serverTimestamp()
@@ -1718,9 +2268,9 @@ Do not wrap response in markdown blocks or write conversational text. Return raw
                 
                 setTimeout(() => {
                     btn.innerText = "Sync to Cloud";
-                    btn.className = "w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold rounded-xl transition-all shadow text-xs font-mono";
+                    btn.className = "w-full py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold rounded-xl transition-all shadow text-xs font-mono uppercase";
                 }, 2000);
-                showStatusToast("Song saved to Shared Space!");
+                showStatusToast("Successfully synced spatial patterns to the cloud!");
             } catch (error) {
                 console.error("Save Error:", error);
                 showStatusToast("Failed to save song to cloud.", true);
@@ -1729,7 +2279,9 @@ Do not wrap response in markdown blocks or write conversational text. Return raw
 
         window.onload = () => {
             renderGrid();
+            renderInstrumentControls();
             init3DScene();
+            setupImageUpload();
             setupSync();
         };
     </script>
